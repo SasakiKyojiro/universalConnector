@@ -4,12 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
+import java.util.Map;
 
 public class Configuration {
     public Logging logging;
-    public SystemConfig system_type_a;
-    public SystemConfig system_type_b;
+    public Map<String, SystemConfig> systems;
 
     public static class Logging {
         public boolean enabled;
@@ -20,18 +19,19 @@ public class Configuration {
         public int timeout;
         public String domain;
         public boolean use_auth;
-        public Authorization authorization;
+        public AuthorizationConfig authorization;
         public int packages_delay;
-        public List<Package> packages;
+        public Package[] packages;
 
-        public static class Authorization {
+        public static class AuthorizationConfig {
             public String type;
-            public String name;
-            public boolean need_login;
+            public String login_url;
             public String method;
-            public List<Param> params;
+            public Map<String, String> params;
+            public Map<String, String> headers;
+            public String response_token_field;
             public boolean need_update;
-            public int timeout_update;
+            public int update_interval;
         }
 
         public static class Package {
@@ -40,23 +40,10 @@ public class Configuration {
             public String method;
             public String url;
             public int delay;
-            public PathVariable path_variable;
-            public List<Param> request_params;
-            public List<Param> request_body;
-            public List<Param> response_params;
-        }
-
-        public static class PathVariable {
-            public String type_param;
-            public String name;
-            public String value;
-        }
-
-        public static class Param {
-            public String type_param;
-            public String name;
-            public String value;
-            public List<Param> params;
+            public Map<String, String> path_variables;
+            public Map<String, String> request_params;
+            public Map<String, Object> request_body;
+            public Map<String, Object> response_params;
         }
     }
 

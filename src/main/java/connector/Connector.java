@@ -1,10 +1,18 @@
 package connector;
 
+
 import client.RestClient;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import config.Configuration;
 import log.LogUtil;
 
+import java.io.IOException;
 import java.net.http.HttpResponse;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 public class Connector {
     private final Configuration config;
@@ -13,49 +21,116 @@ public class Connector {
 
     public Connector(Configuration config) {
         this.config = config;
-        this.clientA = new RestClient(config.system_type_a);
-        this.clientB = new RestClient(config.system_type_b);
+        this.clientA = new RestClient(config.systems.get("type_a"));
+        this.clientB = new RestClient(config.systems.get("type_b"));
     }
 
-    public void transferData(String endpointA, String endpointB) {
-        try {
-            HttpResponse<String> responseA = clientA.get(endpointA);
-            if (responseA.statusCode() == 200) {
-                String data = responseA.body();
-                retrySend(data, endpointB);
-                if (config.logging.enabled) {
-                    // Log successful transfer
-                    LogUtil.log(config.logging.log_path, "Transferred data: " + data);
+    public void transferData() {
+        Configuration.SystemConfig systemA = config.systems.get("type_a");
+        Configuration.SystemConfig.Package[] packages = systemA.packages;
+        Arrays.sort(packages, (p1, p2) -> Integer.compare(p1.priority, p2.priority));
+
+        for (Configuration.SystemConfig.Package pkg : packages) {
+            try {
+                HttpResponse<String> response = null;
+
+                switch (pkg.method.toUpperCase()) {
+                    case "GET":
+                        response = clientA.get(pkg.url);
+                        break;
+                    case "POST":
+                        response = clientA.post(pkg.url, buildRequestBody(pkg.request_body));
+                        break;
+                    case "PUT":
+                        response = clientA.put(pkg.url, buildRequestBody(pkg.request_body));
+                        break;
                 }
-            } else {
-                // Handle error from system A
-                if (config.logging.enabled) {
-                    LogUtil.log(config.logging.log_path, "Failed to fetch data from System A: " + responseA.body());
+
+                if (response != null && response.statusCode() == 200) {
+                    String data = response.body();
+                    retrySend(data, pkg);
+                    if (config.logging.enabled) {
+                        LogUtil.log(config.logging.log_path, "Transferred data: " + data);
+                    }
+                } else {
+                    if (config.logging.enabled) {
+                        LogUtil.log(config.logging.log_path, "Failed to fetch data from System A: " + (response != null ? response.body() : "null response"));
+                    }
                 }
-            }
-        } catch (Exception e) {
-            if (config.logging.enabled) {
-                LogUtil.log(config.logging.log_path, "Error during data transfer: " + e.getMessage());
+
+                Thread.sleep(pkg.delay);
+            } catch (IOException | InterruptedException e) {
+                if (config.logging.enabled) {
+                    LogUtil.log(config.logging.log_path, "Error during data transfer: " + e.getMessage());
+                }
+                e.printStackTrace();
             }
         }
     }
 
-    private void retrySend(String data, String endpointB) {
+    private String buildRequestBody(Map<String, Object> params) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode body = mapper.createObjectNode();
+        for (Map.Entry<String, Object> entry : params.entrySet()) {
+            appendToBody(body, entry.getKey(), entry.getValue());
+        }
+        return mapper.writeValueAsString(body);
+    }
+
+    private void appendToBody(ObjectNode body, String key, Object value) {
+        ObjectMapper mapper = new ObjectMapper();
+        if (value instanceof String) {
+            body.put(key, (String) value);
+        } else if (value instanceof Integer) {
+            body.put(key, (Integer) value);
+        } else if (value instanceof Boolean) {
+            body.put(key, (Boolean) value);
+        } else if (value instanceof Map) {
+            ObjectNode nestedObject = mapper.createObjectNode();
+            for (Map.Entry<String, Object> entry : ((Map<String, Object>) value).entrySet()) {
+                appendToBody(nestedObject, entry.getKey(), entry.getValue());
+            }
+            body.set(key, nestedObject);
+        } else if (value instanceof List) {
+            ArrayNode arrayNode = mapper.createArrayNode();
+            for (Object item : (List<Object>) value) {
+                if (item instanceof String) {
+                    arrayNode.add((String) item);
+                } else if (item instanceof Integer) {
+                    arrayNode.add((Integer) item);
+                } else if (item instanceof Boolean) {
+                    arrayNode.add((Boolean) item);
+                } else if (item instanceof Map) {
+                    ObjectNode nestedObject = mapper.createObjectNode();
+                    for (Map.Entry<String, Object> entry : ((Map<String, Object>) item).entrySet()) {
+                        appendToBody(nestedObject, entry.getKey(), entry.getValue());
+                    }
+                    arrayNode.add(nestedObject);
+                }
+            }
+            body.set(key, arrayNode);
+        } else {
+            body.putPOJO(key, value);
+        }
+    }
+
+    private void retrySend(String data, Configuration.SystemConfig.Package pkg) {
         int attempts = 0;
         boolean success = false;
-        while (!success && attempts < config.system_type_b.authorization.timeout_update) {
+        Configuration.SystemConfig systemB = config.systems.get("type_b");
+        while (!success && attempts < systemB.authorization.update_interval) {
             try {
-                HttpResponse<String> responseB = clientB.post(endpointB, data);
-                if (responseB.statusCode() == 200 || responseB.statusCode() == 201) {
+                HttpResponse<String> response = clientB.post(pkg.url, data);
+                if (response.statusCode() == 200 || response.statusCode() == 201) {
                     success = true;
                 } else {
                     attempts++;
-                    Thread.sleep(config.system_type_b.authorization.timeout_update);
+                    Thread.sleep(systemB.authorization.update_interval);
                 }
             } catch (Exception e) {
                 attempts++;
                 try {
-                    Thread.sleep(config.system_type_b.authorization.timeout_update);
+                    Thread.sleep(systemB.authorization.update_interval);
                 } catch (InterruptedException ie) {
                     // Handle interrupted exception
                 }
