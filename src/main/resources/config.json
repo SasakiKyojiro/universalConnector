@@ -1,0 +1,101 @@
+{
+  "logging": {
+    "enabled": true,
+    "log_path": "/src/logging_data"
+  },
+  "system_type_a": {
+    "timeout": 1000,
+    "domain": "http://localhost:8080",
+    "use_auth": true,
+    "authorization": {
+      "type": "AUTH-TOKEN",
+      "name": "token",
+      "need_login": true,
+      "method": "POST",
+      "params": [
+        {"type_param": "STRING", "name": "login", "value": "login"},
+        {"type_param": "STRING", "name": "password", "value": "password"}
+      ],
+      "need_update": true,
+      "timeout_update": 120
+    },
+    "packages_delay": 1000,
+    "packages": [
+      {
+        "priority": 0,
+        "key": "get_status",
+        "method": "GET",
+        "url": "/api/v1/get-status",
+        "delay": 1000,
+        "path_variable": {},
+        "request_params": [
+          {"type_param": "STRING", "name": "device_name", "value": "MC302-11"},
+          {"type_param": "STRING", "name": "date_start", "value":"2024-05-27 10:31"},
+          {"type_param": "DATETIME", "name": "date_end", "value": "NOW|format|yyyy-MM-dd HH:mm"},
+          {"type_param": "AUTH-TOKEN", "name": "token", "value": "AUTH-TOKEN"}
+        ],
+        "request_body": [],
+        "response_params": [
+          {"type_param": "STRING", "name": "device_name"},
+          {"type_param": "STRING", "name": "description"},
+          {"type_param": "OBJECT", "name": "rows", "params": [
+            {"type_param": "STRING", "name": "name"},
+            {"type_param": "LIST|INT", "name": "counter"},
+            {"type_param": "LIST|OBJECT", "name": "data", "params": [
+              {"type_param": "DATETIME", "name": "date"},
+              {"type_param": "BOOLEAN", "name": "is_active"},
+              {"type_param": "INT", "name": "value"}
+            ]}
+          ]}
+        ]
+      },
+      {
+        "priority": 1,
+        "key": "get_current_date",
+        "method": "GET",
+        "url": "/api/v1/get-current-date",
+        "delay": 0,
+        "path_variable": {"type_param": "AUTH-TOKEN", "name": "token", "value": "AUTH-TOKEN"},
+        "request_params": [],
+        "request_body": [],
+        "response_params": [{"type_param": "DATETIME", "name": "current-date"}]
+      },
+      {
+        "priority": 2,
+        "key": "get_data",
+        "method": "POST",
+        "url": "/api/v1/get-data",
+        "delay": 0,
+        "path_variable": {"type_param": "AUTH-TOKEN", "name": "token", "value": "AUTH-TOKEN"},
+        "request_params": [],
+        "request_body": [
+          {"type_param": "STRING", "name": "device_name"},
+          {"type_param": "STRING", "name": "description"},
+          {"type_param": "OBJECT", "name": "rows", "params": [
+            {"type_param": "STRING", "name": "name"},
+            {"type_param": "INT", "name": "number"}
+          ]}
+        ],
+        "response_params": [{"type_param": "BOOLEAN", "name": "status"}]
+      }
+    ]
+  },
+  "system_type_b": {
+    "timeout": 1000,
+    "domain": "http://localhost:80",
+    "use_auth": true,
+    "authorization": {
+      "type": "PERMANENT-TOKEN",
+      "need_login": false,
+      "method": "NONE",
+      "params": [
+        {"type_param": "STRING", "name": "token", "value": "1-23o1023003032130krfkfkf012"}
+      ],
+      "need_update": false,
+      "timeout_update": 0
+    },
+    "packages_delay": 0,
+    "packages": []
+  }
+}
+
