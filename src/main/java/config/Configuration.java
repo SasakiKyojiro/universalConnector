@@ -2,9 +2,8 @@ package config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.File;
 import java.io.IOException;
-
+import java.io.InputStream;
 import java.util.List;
 
 public class Configuration {
@@ -61,8 +60,13 @@ public class Configuration {
         }
     }
 
-    public static Configuration load(String filePath) throws IOException {
+    public static Configuration load(String resourcePath) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(new File(filePath), Configuration.class);
+        try (InputStream inputStream = Configuration.class.getClassLoader().getResourceAsStream(resourcePath)) {
+            if (inputStream == null) {
+                throw new IOException("Resource not found: " + resourcePath);
+            }
+            return mapper.readValue(inputStream, Configuration.class);
+        }
     }
 }

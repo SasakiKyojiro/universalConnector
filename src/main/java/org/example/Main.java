@@ -7,12 +7,7 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
-        if (args.length != 1) {
-            System.err.println("Usage: java Main <config-file-path>");
-            System.exit(1);
-        }
-
-        String configFilePath = args[0];
+        String configFilePath = "config.json";  // Path to the config file in resources
         try {
             Configuration config = Configuration.load(configFilePath);
             Connector connector = new Connector(config);
