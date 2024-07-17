@@ -10,6 +10,7 @@ public class Main {
 
         ConfigParser configParser = new ConfigParser();
         config = configParser.parseConfig(configFilePath);
+        System.out.println("Парсинг");
 //        try {
 //            ConfigParser configParser = new ConfigParser();
 //            config = configParser.parseConfig(configFilePath);

@@ -11,7 +11,7 @@ import java.io.InputStream;
 public class ConfigParser {
     public Config parseConfig(String filePath) {
         ObjectMapper mapper = new ObjectMapper();
-        try (InputStream inputStream = Configuration.class.getClassLoader().getResourceAsStream(filePath)) {
+        try (InputStream inputStream = Config.class.getClassLoader().getResourceAsStream(filePath)) {
             if (inputStream == null) {
                 throw new IOException("Resource not found: " + filePath);
             }

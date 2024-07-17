@@ -2,7 +2,6 @@ package client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import config.Configuration;
 import config.System;
 
 import java.io.IOException;
