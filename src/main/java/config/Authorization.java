@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Authorization {
-    private String type;
+    private AuthorizationType type;
     private boolean need_loging;
     private String method;
     private String name;

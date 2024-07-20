@@ -1,5 +1,8 @@
 package config;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum ParameterType {
     STRING,
     DATETIME,
@@ -7,5 +10,7 @@ public enum ParameterType {
     BOOLEAN,
     INT,
     LIST,
-    OBJECT
+    OBJECT,
+    LIST_INT,
+    LIST_OBJECT
 }

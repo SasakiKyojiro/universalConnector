@@ -11,7 +11,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class System {
+public class SystemConfig {
     private int timeout;
     private String domain;
     private boolean use_auth;

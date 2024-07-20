@@ -12,6 +12,6 @@ import lombok.Setter;
 public class Config {
     private boolean logging;
     private String log_path;
-    private System system_type_a;
-    private System system_type_b;
+    private SystemConfig system_type_a;
+    private SystemConfig system_type_b;
 }

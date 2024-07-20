@@ -1,20 +1,6 @@
 package connector;
 
 
-import client.RestClient;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import config.Config;
-import config.System;
-import log.LogUtil;
-
-import java.io.IOException;
-import java.net.http.HttpResponse;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
 public class Connector {
 //    private final Config config;
 //    private final RestClient clientA;

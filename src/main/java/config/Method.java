@@ -3,7 +3,9 @@ package config;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
-public enum SystemType {
-    SYSTEM_TYPE_A,
-    SYSTEM_TYPE_B
+public enum Method {
+    POST,
+    GET,
+    PUT,
+    NONE
 }

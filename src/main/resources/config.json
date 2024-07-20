@@ -6,7 +6,7 @@
     "domain": "http://localhost:8080",
     "use_auth": true,
     "authorization": {
-      "type": "AUTH-TOKEN",
+      "type": "AUTH_TOKEN",
       "name": "token",
       "need_loging": true,
       "method": "POST",
@@ -51,9 +51,9 @@
             "value": "NOW|format|yyyy-MM-dd HH:mm"
           },
           {
-            "type_param": "AUTH-TOKEN",
+            "type_param": "AUTH_TOKEN",
             "name": "token",
-            "value": "AUTH-TOKEN"
+            "value": "AUTH_TOKEN"
           }
         ],
         "request_body": [],
@@ -107,9 +107,9 @@
         "url": "/api/v1/get-current-date",
         "delay": 0,
         "path_variable": {
-          "type_param": "AUTH-TOKEN",
+          "type_param": "AUTH_TOKEN",
           "name": "token",
-          "value": "AUTH-TOKEN"
+          "value": "AUTH_TOKEN"
         },
         "request_params": [],
         "request_body": [],
@@ -127,9 +127,9 @@
         "url": "/api/v1/get-data",
         "delay": 0,
         "path_variable": {
-          "type_param": "AUTH-TOKEN",
+          "type_param": "AUTH_TOKEN",
           "name": "token",
-          "value": "AUTH-TOKEN"
+          "value": "AUTH_TOKEN"
         },
         "request_params": [],
         "request_body": [
@@ -170,7 +170,7 @@
     "domain": "http://localhost:80",
     "use_auth": true,
     "authorization": {
-      "type": "PERMAMENT-TOKEN",
+      "type": "PERMANENT_TOKEN",
       "need_loging": false,
       "method": "NONE",
       "params": [

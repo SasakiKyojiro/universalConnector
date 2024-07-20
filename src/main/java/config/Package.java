@@ -15,7 +15,7 @@ import java.util.Map;
 public class Package {
     private int priority;
     private String key;
-    private String method;
+    private Method method;
     private String url;
     private int delay;
     private Map<String, Object> path_variable;

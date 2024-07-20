@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Parameter {
-    private String type_param;
+    private ParameterType type_param;
     private String name;
     private String value;
     private List<Parameter> params; // для вложенных параметров
