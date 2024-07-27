@@ -27,10 +27,13 @@ public class Main {
 //               logger.log(config.getLog_path(), "Failed to load configuration: " + e.getMessage());
 //            }
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            System.err.println("ошибка 2");
         }
-        RequestProcessor requestProcessor = new RequestProcessor();
-        List<String> requests = requestProcessor.processConfig(config);
-        System.out.println("Пакеты собраны " + requests);
+        if (config != null) {
+            System.out.println("что-то");
+            RequestProcessor requestProcessor = new RequestProcessor();
+            List<String> requests = requestProcessor.processConfig(config);
+            System.out.println("Пакеты собраны " + requests);
+        }
     }
 }

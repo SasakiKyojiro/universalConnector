@@ -170,11 +170,13 @@
             "params": [
               {
                 "type_param": "STRING",
-                "name": "name"
+                "name": "name",
+                "value": "test2"
               },
               {
                 "type_param": "INT",
-                "name": "number"
+                "name": "number",
+                "value": "test2"
               }
             ]
           }

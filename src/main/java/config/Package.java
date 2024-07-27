@@ -13,12 +13,12 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Package {
-    private int priority;
+    private Integer id;
     private String key;
     private Method method;
     private String url;
-    private int delay;
-    private Map<String, Object> path_variable;
+    private Integer delay;
+    private Parameter path_variable;
     private List<Parameter> request_params;
     private List<Parameter> request_body;
     private List<Parameter> response_params;
