@@ -9,12 +9,13 @@ import java.nio.file.StandardOpenOption;
 public class LogUtil {
     public static void log(String logPath, String message) {
         try {
-            Path path = Paths.get(logPath, "connector.log");
+            String currentDir = System.getProperty("user.dir");
+            Path relativePath = Paths.get(currentDir, logPath, "connector.log");
             // Ensure the directory exists
-            if (Files.notExists(path.getParent())) {
-                Files.createDirectories(path.getParent());
+            if (Files.notExists(relativePath.getParent())) {
+                Files.createDirectories(relativePath.getParent());
             }
-            Files.writeString(path, message + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            Files.writeString(relativePath, message + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         } catch (IOException e) {
             e.printStackTrace();
         }

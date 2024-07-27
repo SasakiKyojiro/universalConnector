@@ -20,6 +20,7 @@ public class RequestProcessor {
                 // Собираем JSON запрос из requestBody
                 JSONObject jsonRequest = new JSONObject();
                 for (Parameter param : pack.getRequest_body()) {
+                    // object = вложенный json
                     jsonRequest.append(param.getName(), param.getType_param());
                 }
                 requests.add(jsonRequest.toString());
@@ -27,6 +28,7 @@ public class RequestProcessor {
                 StringBuilder urlBuilder = new StringBuilder(pack.getUrl());
                 if (pack.getRequest_params().isEmpty()) {
                     // Собираем URL из pathVariable
+                    // переделать (он должен брать только value из path_variable, а не все поля)
                     for (Map.Entry<String, Object> entry : pack.getPath_variable().entrySet()) {
                         urlBuilder.append("/").append(entry.getValue());
                     }
@@ -41,6 +43,7 @@ public class RequestProcessor {
 
                     }
                 }
+                // пробел заменить на %20
                 requests.add(urlBuilder.toString());
             }
         }

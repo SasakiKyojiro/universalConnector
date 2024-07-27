@@ -28,7 +28,7 @@
     "packages_delay": 1000,
     "packages": [
       {
-        "priority": 0,
+        "id": 0,
         "key": "get_status",
         "method": "GET",
         "url": "/api/v1/get-status",
@@ -60,11 +60,17 @@
         "response_params": [
           {
             "type_param": "STRING",
-            "name": "device_name"
+            "name": "device_name",
+            "flag": true,
+            "name_b": "fsdf",
+            "id_b": 0
           },
           {
             "type_param": "STRING",
-            "name": "description"
+            "name": "description",
+            "flag": true,
+            "name_b": "fsdf",
+            "id_b": 0
           },
           {
             "type_param": "OBJECT",
@@ -72,11 +78,17 @@
             "params": [
               {
                 "type_param": "STRING",
-                "name": "name"
+                "name": "name",
+                "flag": true,
+                "name_b": "fsdf",
+                "id_b": 0
               },
               {
                 "type_param": "LIST|INT",
-                "name": "counter"
+                "name": "counter",
+                "flag": true,
+                "name_b": "fsdf",
+                "id_b": 0
               },
               {
                 "type_param": "LIST|OBJECT",
@@ -84,15 +96,24 @@
                 "params": [
                   {
                     "type_param": "DATETIME",
-                    "name": "date"
+                    "name": "date",
+                    "flag": true,
+                    "name_b": "fsdf",
+                    "id_b": 0
                   },
                   {
                     "type_param": "BOOLEAN",
-                    "name": "is_active"
+                    "name": "is_active",
+                    "flag": true,
+                    "name_b": "fsdf",
+                    "id_b": 0
                   },
                   {
                     "type_param": "INT",
-                    "name": "value"
+                    "name": "value",
+                    "flag": true,
+                    "name_b": "fsdf",
+                    "id_b": 0
                   }
                 ]
               }
@@ -101,7 +122,7 @@
         ]
       },
       {
-        "priority": 1,
+        "id": 1,
         "key": "get_current_date",
         "method": "GET",
         "url": "/api/v1/get-current-date",
@@ -116,30 +137,32 @@
         "response_params": [
           {
             "type_param": "DATETIME",
-            "name": "current-date"
+            "name": "current-date",
+            "flag": true,
+            "name_b": "fsdf",
+            "id_b": 0
           }
         ]
       },
       {
-        "priority": 2,
+        "id": 2,
         "key": "get_data",
         "method": "POST",
         "url": "/api/v1/get-data",
         "delay": 0,
-        "path_variable": {
-          "type_param": "AUTH_TOKEN",
-          "name": "token",
-          "value": "AUTH_TOKEN"
-        },
+        "path_variable": {},
         "request_params": [],
         "request_body": [
           {
             "type_param": "STRING",
-            "name": "device_name"
+            "name": "device_name",
+            "value" : "test",
+            "flag": "true"
           },
           {
             "type_param": "STRING",
-            "name": "description"
+            "name": "description",
+            "value": "test2"
           },
           {
             "type_param": "OBJECT",
@@ -159,7 +182,10 @@
         "response_params": [
           {
             "type_param": "BOOLEAN",
-            "name": "status"
+            "name": "status",
+            "flag": true,
+            "name_b": "fsdf",
+            "id_b": 0
           }
         ]
       }
