@@ -1,5 +1,6 @@
-package config;
+package config.json;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,10 +13,16 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SystemConfig {
+    @JsonProperty("timeout")
     private int timeout;
+    @JsonProperty("domain")
     private String domain;
-    private boolean use_auth;
+    @JsonProperty("use_auth")
+    private boolean useAuth;
+    @JsonProperty("authorization")
     private Authorization authorization;
-    private int packages_delay;
+    @JsonProperty("packages_delay")
+    private int packagesDelay;
+    @JsonProperty("packages")
     private List<Package> packages;
 }

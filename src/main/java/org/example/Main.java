@@ -1,9 +1,8 @@
 package org.example;
 
-import config.Config;
-import config.ConfigParser;
+import config.json.Config;
+import config.parser.ConfigParser;
 import config.packages.RequestProcessor;
-import log.LogUtil;
 
 import java.io.IOException;
 import java.util.List;

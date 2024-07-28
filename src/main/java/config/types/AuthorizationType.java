@@ -1,4 +1,4 @@
-package config;
+package config.types;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
