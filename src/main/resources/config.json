@@ -62,14 +62,14 @@
             "type_param": "STRING",
             "name": "device_name",
             "flag": true,
-            "name_b": "fsdf",
+            "name_b": "device_name",
             "id_b": 0
           },
           {
             "type_param": "STRING",
             "name": "description",
             "flag": true,
-            "name_b": "fsdf",
+            "name_b": "description",
             "id_b": 0
           },
           {
@@ -80,14 +80,14 @@
                 "type_param": "STRING",
                 "name": "name",
                 "flag": true,
-                "name_b": "fsdf",
+                "name_b": "name",
                 "id_b": 0
               },
               {
                 "type_param": "LIST|INT",
                 "name": "counter",
                 "flag": true,
-                "name_b": "fsdf",
+                "name_b": "counter",
                 "id_b": 0
               },
               {
@@ -98,14 +98,14 @@
                     "type_param": "DATETIME",
                     "name": "date",
                     "flag": true,
-                    "name_b": "fsdf",
+                    "name_b": "date",
                     "id_b": 0
                   },
                   {
                     "type_param": "BOOLEAN",
                     "name": "is_active",
                     "flag": true,
-                    "name_b": "fsdf",
+                    "name_b": "is_active",
                     "id_b": 0
                   },
                   {
@@ -139,8 +139,8 @@
             "type_param": "DATETIME",
             "name": "current-date",
             "flag": true,
-            "name_b": "fsdf",
-            "id_b": 0
+            "name_b": "current-date",
+            "id_b": 1
           }
         ]
       },
@@ -156,13 +156,18 @@
           {
             "type_param": "STRING",
             "name": "device_name",
-            "value" : "test",
-            "flag": "true"
+            "value": "test",
+            "flag": true,
+            "name_b": "device_name",
+            "id_b": 2
           },
           {
             "type_param": "STRING",
             "name": "description",
-            "value": "test2"
+            "value": "test2",
+            "flag": true,
+            "name_b": "description",
+            "id_b": 2
           },
           {
             "type_param": "OBJECT",
@@ -171,12 +176,18 @@
               {
                 "type_param": "STRING",
                 "name": "name",
-                "value": "test2"
+                "value": "test2",
+                "flag": true,
+                "name_b": "name",
+                "id_b": 2
               },
               {
                 "type_param": "INT",
                 "name": "number",
-                "value": "test2"
+                "value": 12,
+                "flag": true,
+                "name_b": "number",
+                "id_b": 2
               }
             ]
           }
@@ -184,10 +195,7 @@
         "response_params": [
           {
             "type_param": "BOOLEAN",
-            "name": "status",
-            "flag": true,
-            "name_b": "fsdf",
-            "id_b": 0
+            "name": "status"
           }
         ]
       }
@@ -212,6 +220,119 @@
       "timeout_update": 0
     },
     "packages_delay": 0,
-    "packages": []
+    "packages": [
+      {
+        "id": 0,
+        "key": "send_status",
+        "method": "POST",
+        "url": "/api/v1/send-data",
+        "delay": 0,
+        "path_variable": {},
+        "request_params": [],
+        "request_body": [
+          {
+            "type_param": "STRING",
+            "name": "device_name"
+          },
+          {
+            "type_param": "STRING",
+            "name": "description"
+          },
+          {
+            "type_param": "OBJECT",
+            "name": "rows",
+            "params": [
+              {
+                "type_param": "STRING",
+                "name": "name"
+              },
+              {
+                "type_param": "LIST|INT",
+                "name": "counter"
+              },
+              {
+                "type_param": "LIST|OBJECT",
+                "name": "data",
+                "params": [
+                  {
+                    "type_param": "DATETIME",
+                    "name": "date"
+                  },
+                  {
+                    "type_param": "BOOLEAN",
+                    "name": "is_active"
+                  },
+                  {
+                    "type_param": "INT",
+                    "name": "value"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "response_params": [
+          {
+            "type_param": "BOOLEAN",
+            "name": "status"
+          }
+        ]
+      },
+      {
+        "id": 1,
+        "key": "send_current_date",
+        "method": "POST",
+        "url": "/api/v1/send-current-date",
+        "delay": 0,
+        "path_variable": {},
+        "request_params": [],
+        "request_body": [
+          {
+            "type_param": "DATETIME",
+            "name": "current-date"
+          }
+        ],
+        "response_params": []
+      },
+      {
+        "id": 2,
+        "key": "get_data",
+        "method": "POST",
+        "url": "/api/v1/get-data",
+        "delay": 0,
+        "path_variable": {},
+        "request_params": [],
+        "request_body": [
+          {
+            "type_param": "STRING",
+            "name": "device_name"
+          },
+          {
+            "type_param": "STRING",
+            "name": "description"
+          },
+          {
+            "type_param": "OBJECT",
+            "name": "rows",
+            "params": [
+              {
+                "type_param": "STRING",
+                "name": "name"
+              },
+              {
+                "type_param": "INT",
+                "name": "number"
+              }
+            ]
+          }
+        ],
+        "response_params": [
+          {
+            "type_param": "BOOLEAN",
+            "name": "status"
+          }
+        ]
+      }
+    ]
   }
 }
