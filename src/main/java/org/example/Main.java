@@ -1,6 +1,8 @@
 package org.example;
 
+import client.connector.PackageProcessor;
 import config.json.Config;
+import config.packages.PackageConnector;
 import config.parser.ConfigParser;
 import config.packages.RequestProcessor;
 
@@ -30,9 +32,8 @@ public class Main {
         }
         if (config != null) {
             System.out.println("что-то");
-            RequestProcessor requestProcessor = new RequestProcessor();
-            List<String> requests = requestProcessor.processConfig(config);
-            System.out.println("Пакеты собраны " + requests);
+            PackageProcessor processor = new PackageProcessor(config);
+
         }
     }
 }

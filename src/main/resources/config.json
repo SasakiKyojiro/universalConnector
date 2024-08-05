@@ -207,6 +207,7 @@
     "use_auth": true,
     "authorization": {
       "type": "PERMANENT_TOKEN",
+      "name": "token",
       "need_loging": false,
       "method": "NONE",
       "params": [
