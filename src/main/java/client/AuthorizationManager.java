@@ -8,6 +8,9 @@ import lombok.SneakyThrows;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -19,17 +22,18 @@ public class AuthorizationManager {
     private Boolean authenticated = false;
 
     private String domain;
-    private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private Timer timer = new Timer("AuthorizationManager", true);
     private String login;
     private String password;
     private Connector connector;
+    CountDownLatch latch = new CountDownLatch(1);
 
     public AuthorizationManager(String domain, Connector connector) {
         this.domain = domain;
         this.connector = connector;
     }
 
-    public void authorize(Authorization authorization) {
+    public void authorize(Authorization authorization, Boolean cikle) {
         System.out.println("Authorizing " + authorization.getName());
         switch (authorization.getType()) {
             case AUTH_TOKEN -> {
@@ -42,15 +46,21 @@ public class AuthorizationManager {
                     }
                 }
                 if (authorization.isNeedLogging()) {
-                    scheduler.scheduleWithFixedDelay(() -> {
-                        try {
-                            token = getToken();
-                            authenticated = true;
-                        } catch (Exception e) {
-                            authenticated = false;
-                            throw new RuntimeException(e);
+                    TimerTask task = new TimerTask() {
+                        @Override
+                        public void run() {
+                            try {
+                                token = getToken();
+                                authenticated = true;
+                            } catch (Exception e) {
+                                authenticated = false;
+                                System.err.println("Превышен лимит попыток подключения");
+                                timer.cancel();
+                            }
                         }
-                    }, 0, authorization.getTimeoutUpdate(), TimeUnit.SECONDS);
+                    };
+                    timer.scheduleAtFixedRate(task, 0, authorization.getTimeoutUpdate());
+
                 }
             }
             case PERMANENT_TOKEN -> {
@@ -62,7 +72,7 @@ public class AuthorizationManager {
             }
             default -> throw new IllegalStateException("Unexpected value: " + authorization.getType());
         }
-
+        cikle = true;
     }
 
     @SneakyThrows
@@ -85,10 +95,6 @@ public class AuthorizationManager {
                 System.err.println("Error: " + "Время ожидания превышено " + domain);
                 Thread.sleep(1000);
             }
-        }
-        if (retryCount == maxRetries) {
-            System.err.println("Превышен лимит попыток подключения");
-            scheduler.shutdown();
         }
         String token = jsonResponse.getString("token");
         return token;
