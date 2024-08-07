@@ -1,13 +1,10 @@
 package org.example;
 
-import client.connector.PackageProcessor;
+import client.PackageProcessor;
 import config.json.Config;
-import config.packages.PackageConnector;
 import config.parser.ConfigParser;
-import config.packages.RequestProcessor;
 
 import java.io.IOException;
-import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
