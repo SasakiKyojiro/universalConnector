@@ -3,13 +3,15 @@ package client;
 import client.connector.Connector;
 import config.json.Authorization;
 import config.json.Parameter;
+import exception.AuthorizationTimeoutException;
 import lombok.Getter;
-import lombok.SneakyThrows;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.concurrent.Executors;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class AuthorizationManager {
@@ -19,18 +21,20 @@ public class AuthorizationManager {
     private Boolean authenticated = false;
 
     private String domain;
-    private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
     private String login;
     private String password;
     private Connector connector;
+    private Authorization authorization;
 
-    public AuthorizationManager(String domain, Connector connector) {
+    public AuthorizationManager(String domain, Connector connector, Authorization authorization) {
         this.domain = domain;
         this.connector = connector;
+        this.authorization = authorization;
     }
 
-    public void authorize(Authorization authorization) {
-        System.out.println("Authorizing " + authorization.getName());
+    public void authorize() throws AuthorizationTimeoutException {
+        System.out.println("Authorizing " + authorization.getName() + " " + domain);
         switch (authorization.getType()) {
             case AUTH_TOKEN -> {
                 for (Parameter parameter : authorization.getParams()) {
@@ -42,15 +46,7 @@ public class AuthorizationManager {
                     }
                 }
                 if (authorization.isNeedLogging()) {
-                    scheduler.scheduleWithFixedDelay(() -> {
-                        try {
-                            token = getToken();
-                            authenticated = true;
-                        } catch (Exception e) {
-                            authenticated = false;
-                            throw new RuntimeException(e);
-                        }
-                    }, 0, authorization.getTimeoutUpdate(), TimeUnit.SECONDS);
+                    token = getToken();
                 }
             }
             case PERMANENT_TOKEN -> {
@@ -65,8 +61,7 @@ public class AuthorizationManager {
 
     }
 
-    @SneakyThrows
-    private String getToken() {
+    private String getToken() throws AuthorizationTimeoutException {
         // Создаем JSON объект с логином и паролем
         JSONObject json = new JSONObject();
         json.put("login", login);
@@ -74,7 +69,7 @@ public class AuthorizationManager {
         // Обработка ответа и извлечение токена
         JSONObject jsonResponse = null;
 
-        int maxRetries = 5;
+        int maxRetries = 3;
         int retryCount = 0;
         while (retryCount < maxRetries) {
             try {
@@ -83,12 +78,15 @@ public class AuthorizationManager {
             } catch (IOException e) {
                 retryCount++;
                 System.err.println("Error: " + "Время ожидания превышено " + domain);
-                Thread.sleep(1000);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         }
         if (retryCount == maxRetries) {
-            System.err.println("Превышен лимит попыток подключения");
-            scheduler.shutdown();
+            throw new AuthorizationTimeoutException("Превышен лимит попыток подключения");
         }
         String token = jsonResponse.getString("token");
         return token;

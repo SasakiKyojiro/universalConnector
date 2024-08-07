@@ -8,12 +8,11 @@ import config.packages.LinkedPackage;
 import config.packages.PackageConnector;
 import config.packages.RequestProcessor;
 import config.types.Method;
-import config.types.ParameterType;
+import exception.AuthorizationTimeoutException;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 public class PackageProcessor {
     private Config config;
@@ -23,26 +22,49 @@ public class PackageProcessor {
     private AuthorizationManager authorizationB;
     private Connector connectorA;
     private Connector connectorB;
+    private SystemConfig systemConfigA;
+    private SystemConfig systemConfigB;
 
-    public PackageProcessor(Config config)  {
+    private ScheduledExecutorService timerAuthorizationA = new ScheduledThreadPoolExecutor(1);
+    private ScheduledExecutorService timerAuthorizationB = new ScheduledThreadPoolExecutor(1);
+
+    public PackageProcessor(Config config) {
         this.config = config;
-        this.packageList = PackageConnector.connectPackages(config);
-        this.executor = Executors.newFixedThreadPool(packageList.size());
-        SystemConfig systemConfigA = config.getSystemTypeA();
-        SystemConfig systemConfigB = config.getSystemTypeB();
+        packageList = PackageConnector.connectPackages(config);
+        executor = Executors.newScheduledThreadPool(packageList.size());
+        systemConfigA = config.getSystemTypeA();
+        systemConfigB = config.getSystemTypeB();
         connectorA = new Connector(systemConfigA.getTimeout());
         connectorB = new Connector(systemConfigB.getTimeout());
-        System.out.println("Подключение к "+ systemConfigA.getDomain());
-        authorizationA = new AuthorizationManager(systemConfigA.getDomain(), connectorA);
-        System.out.println("Подключение к "+ systemConfigB.getDomain());
-        authorizationB = new AuthorizationManager(systemConfigB.getDomain(), connectorB);
-        authorizationA.authorize(systemConfigA.getAuthorization());
-        authorizationB.authorize(systemConfigB.getAuthorization());
-
-        System.out.println(authorizationA.getAuthenticated());
-        System.out.println(authorizationB.getAuthenticated());
+        authorizationA = new AuthorizationManager(systemConfigA.getDomain(), connectorA, systemConfigA.getAuthorization());
+        authorizationB = new AuthorizationManager(systemConfigB.getDomain(), connectorB, systemConfigB.getAuthorization());
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("Shutting down...");
+            timerAuthorizationA.shutdownNow();
+            timerAuthorizationB.shutdownNow();
+        }));
     }
     public void start() {
+        timerAuthorizationA.scheduleAtFixedRate(() -> {
+            try {
+                System.out.println("Authorization A");
+                authorizationA.authorize();
+            } catch (Exception e ) {
+                System.err.println(e.getMessage());
+                System.exit(1);
+            }
+        }, 0, systemConfigA.getTimeout(), TimeUnit.SECONDS);
+
+        timerAuthorizationB.scheduleAtFixedRate(() -> {
+            try {
+                System.out.println("Authorization B");
+                authorizationB.authorize();
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+                System.exit(2);
+            }
+        }, 0, systemConfigA.getTimeout(), TimeUnit.SECONDS);
+
         for (LinkedPackage linkedPackage : packageList) {
             executor.submit(()->{
                if (linkedPackage.getAPackage().getMethod().equals(Method.GET)){

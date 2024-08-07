@@ -24,12 +24,10 @@ public class Main {
 //            if (config != null && config.isLogging()) {
 //               logger.log(config.getLog_path(), "Failed to load configuration: " + e.getMessage());
 //            }
-        } catch (Exception e) {
-            System.err.println("ошибка 2");
         }
         if (config != null) {
-            System.out.println("что-то");
             PackageProcessor processor = new PackageProcessor(config);
+            processor.start();
 
         }
     }
