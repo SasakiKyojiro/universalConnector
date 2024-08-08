@@ -47,6 +47,7 @@ public class AuthorizationManager {
                 }
                 if (authorization.isNeedLogging()) {
                     token = getToken();
+                    authenticated = true;
                 }
             }
             case PERMANENT_TOKEN -> {
@@ -67,19 +68,19 @@ public class AuthorizationManager {
         json.put("login", login);
         json.put("password", password);
         // Обработка ответа и извлечение токена
-        JSONObject jsonResponse = null;
-
+        String jsonResponse = null;
         int maxRetries = 3;
         int retryCount = 0;
         while (retryCount < maxRetries) {
             try {
-                jsonResponse = connector.sendPostRequest(domain, json);
+                jsonResponse = connector.sendPostRequest(domain + "/login", json);
+                System.out.println(jsonResponse.toString());
                 break;
             } catch (IOException e) {
                 retryCount++;
                 System.err.println("Error: " + "Время ожидания превышено " + domain);
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(10000);
                 } catch (InterruptedException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -88,7 +89,7 @@ public class AuthorizationManager {
         if (retryCount == maxRetries) {
             throw new AuthorizationTimeoutException("Превышен лимит попыток подключения");
         }
-        String token = jsonResponse.getString("token");
+        String token = jsonResponse;
         return token;
     }
 }

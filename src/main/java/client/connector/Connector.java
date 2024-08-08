@@ -35,17 +35,19 @@ public class Connector {
         return response.toString();
     }
 
-    public JSONObject sendPostRequest(String urlString, JSONObject requestBody) throws IOException {
+    public String sendPostRequest(String urlString, JSONObject requestBody) throws IOException {
         URL url = new URL(urlString);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setConnectTimeout(timeOut);
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json");
         connection.setDoOutput(true);
+        System.out.println(requestBody.toString());
         try (DataOutputStream wr = new DataOutputStream(connection.getOutputStream())) {
-            byte[] postData = requestBody.toString().getBytes(StandardCharsets.UTF_8);
+            byte[] postData = requestBody.toString().getBytes();
             wr.write(postData);
         }
-        return new JSONObject(processingResponse(connection));
+
+        return processingResponse(connection);
     }
 }

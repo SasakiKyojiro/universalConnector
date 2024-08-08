@@ -44,27 +44,13 @@ public class PackageProcessor {
             timerAuthorizationB.shutdownNow();
         }));
     }
+
     public void start() {
-        timerAuthorizationA.scheduleAtFixedRate(() -> {
-            try {
-                System.out.println("Authorization A");
-                authorizationA.authorize();
-            } catch (Exception e ) {
-                System.err.println(e.getMessage());
-                System.exit(1);
-            }
-        }, 0, systemConfigA.getTimeout(), TimeUnit.SECONDS);
-
-        timerAuthorizationB.scheduleAtFixedRate(() -> {
-            try {
-                System.out.println("Authorization B");
-                authorizationB.authorize();
-            } catch (Exception e) {
-                System.err.println(e.getMessage());
-                System.exit(2);
-            }
-        }, 0, systemConfigA.getTimeout(), TimeUnit.SECONDS);
-
+        timerAuthorization(systemConfigA, timerAuthorizationA, authorizationA);
+        timerAuthorization(systemConfigB, timerAuthorizationB, authorizationB);
+        while (!(authorizationA.getAuthenticated() && authorizationB.getAuthenticated())) { // ожидайка подключения
+            continue;
+        }
         for (LinkedPackage linkedPackage : packageList) {
             executor.submit(()->{
                if (linkedPackage.getAPackage().getMethod().equals(Method.GET)){
@@ -77,5 +63,29 @@ public class PackageProcessor {
                }
             });
         }
+    }
+
+    private void timerAuthorization(SystemConfig systemConfig, ScheduledExecutorService timerAuthorization, AuthorizationManager authorizationManager) {
+        if (systemConfig.getAuthorization().getTimeoutUpdate() > 0)
+
+            timerAuthorization.scheduleAtFixedRate(() -> {
+            try {
+                authorizationManager.authorize();
+            } catch (AuthorizationTimeoutException e) {
+                stop(e);
+            }
+            }, 0, systemConfig.getAuthorization().getTimeoutUpdate(), TimeUnit.SECONDS);
+        else {
+            try {
+                authorizationManager.authorize();
+            } catch (AuthorizationTimeoutException e) {
+                stop(e);
+            }
+        }
+    }
+
+    private void stop(Exception e) {
+        System.err.println(e.getMessage());
+        System.exit(444);
     }
 }

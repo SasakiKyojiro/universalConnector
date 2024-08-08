@@ -203,7 +203,7 @@
   },
   "system_type_b": {
     "timeout": 1000,
-    "domain": "http://localhost:80",
+    "domain": "http://localhost:8081",
     "use_auth": true,
     "authorization": {
       "type": "PERMANENT_TOKEN",
@@ -214,7 +214,7 @@
         {
           "type_param": "STRING",
           "name": "token",
-          "value": "1-23o1023003032130krfkfkf012"
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXNzd29yZCI6InBhc3N3b3JkIiwibG9naW4iOiJsb2dpbiJ9.6lPCrZuCxvZ3Wuh0sq-cs1LO0Y6fVakYevXuwwGn_GE"
         }
       ],
       "need_update": false,
