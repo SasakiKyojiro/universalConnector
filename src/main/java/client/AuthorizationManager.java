@@ -4,15 +4,15 @@ import client.connector.Connector;
 import config.json.Authorization;
 import config.json.Parameter;
 import exception.AuthorizationTimeoutException;
+import exception.DispatchPOSTException;
+import exception.ReceivingException;
 import lombok.Getter;
+
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 public class AuthorizationManager {
     @Getter
@@ -46,7 +46,7 @@ public class AuthorizationManager {
                     }
                 }
                 if (authorization.isNeedLogging()) {
-                    token = getToken();
+                    token = getAuthorizationToken();
                     authenticated = true;
                 }
             }
@@ -62,7 +62,7 @@ public class AuthorizationManager {
 
     }
 
-    private String getToken() throws AuthorizationTimeoutException {
+    private String getAuthorizationToken() throws AuthorizationTimeoutException {
         // Создаем JSON объект с логином и паролем
         JSONObject json = new JSONObject();
         json.put("login", login);
@@ -74,9 +74,9 @@ public class AuthorizationManager {
         while (retryCount < maxRetries) {
             try {
                 jsonResponse = connector.sendPostRequest(domain + "/login", json);
-                System.out.println(jsonResponse.toString());
+                System.out.println("Авторизован");
                 break;
-            } catch (IOException e) {
+            } catch (DispatchPOSTException | ReceivingException e) {
                 retryCount++;
                 System.err.println("Error: " + "Время ожидания превышено " + domain);
                 try {

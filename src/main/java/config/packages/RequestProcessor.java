@@ -35,7 +35,7 @@ public class RequestProcessor {
                 }
             }
             // пробел заменить на %20
-            requests = (urlBuilder.toString().replaceAll(" ", "%20"));
+            requests = (urlBuilder.toString().replaceAll(" ", "%20").replaceAll(":", "%3A"));
         }
         return requests;
     }
