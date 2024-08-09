@@ -156,18 +156,12 @@
           {
             "type_param": "STRING",
             "name": "device_name",
-            "value": "test",
-            "flag": true,
-            "name_b": "device_name",
-            "id_b": 2
+            "value": "test"
           },
           {
             "type_param": "STRING",
             "name": "description",
-            "value": "test2",
-            "flag": true,
-            "name_b": "description",
-            "id_b": 2
+            "value": "test2"
           },
           {
             "type_param": "OBJECT",
@@ -176,18 +170,12 @@
               {
                 "type_param": "STRING",
                 "name": "name",
-                "value": "test2",
-                "flag": true,
-                "name_b": "name",
-                "id_b": 2
+                "value": "test2"
               },
               {
                 "type_param": "INT",
                 "name": "number",
-                "value": 12,
-                "flag": true,
-                "name_b": "number",
-                "id_b": 2
+                "value": 12
               }
             ]
           }
@@ -195,7 +183,10 @@
         "response_params": [
           {
             "type_param": "BOOLEAN",
-            "name": "status"
+            "name": "status",
+            "flag": true,
+            "name_b": "status",
+            "id_b": 2
           }
         ]
       }
@@ -303,30 +294,7 @@
         "delay": 0,
         "path_variable": {},
         "request_params": [],
-        "request_body": [
-          {
-            "type_param": "STRING",
-            "name": "device_name"
-          },
-          {
-            "type_param": "STRING",
-            "name": "description"
-          },
-          {
-            "type_param": "OBJECT",
-            "name": "rows",
-            "params": [
-              {
-                "type_param": "STRING",
-                "name": "name"
-              },
-              {
-                "type_param": "INT",
-                "name": "number"
-              }
-            ]
-          }
-        ],
+        "request_body": [],
         "response_params": [
           {
             "type_param": "BOOLEAN",
