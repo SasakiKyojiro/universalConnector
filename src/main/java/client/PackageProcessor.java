@@ -2,6 +2,7 @@ package client;
 
 
 import client.connector.Connector;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import config.json.Config;
 import config.json.Package;
 import config.json.Parameter;
@@ -15,10 +16,12 @@ import exception.AuthorizationTimeoutException;
 import exception.DispatchGETException;
 import exception.DispatchPOSTException;
 import exception.ReceivingException;
+import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
+import java.io.DataInput;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -27,7 +30,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class PackageProcessor {
-    private final Config config;
     private final List<LinkedPackage> packageList;
     private final AuthorizationManager authorizationA;
     private final AuthorizationManager authorizationB;
@@ -40,7 +42,6 @@ public class PackageProcessor {
     private final ScheduledExecutorService timerAuthorizationB = Executors.newSingleThreadScheduledExecutor();
 
     public PackageProcessor(Config config) {
-        this.config = config;
         packageList = PackageConnector.connectPackages(config);
 //        executor = new ScheduledThreadPoolExecutor(packageList.size());
         systemConfigA = config.getSystemTypeA();
@@ -60,8 +61,16 @@ public class PackageProcessor {
     public void start() {
         timerAuthorization(systemConfigA, timerAuthorizationA, authorizationA);
         timerAuthorization(systemConfigB, timerAuthorizationB, authorizationB);
+        Integer count = 0;
         //ожидайка подключения
-        while (!(authorizationA.getAuthenticated() && authorizationB.getAuthenticated())) continue;
+        while (true) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            if (authorizationA.isAuthenticated() && authorizationB.isAuthenticated()) break;
+        }
         for (LinkedPackage linkedPackage : packageList) {
             executor.scheduleAtFixedRate(() -> {
                 try {
@@ -73,7 +82,6 @@ public class PackageProcessor {
                 } catch (DispatchPOSTException e) {
                     System.err.println("Сломан у "+ linkedPackage.getAPackage().getId() + " отправка POST пакетов" + e.getMessage());
                 }
-
             }, 0, systemConfigA.getPackagesDelay(), TimeUnit.MILLISECONDS);
         }
 
@@ -103,6 +111,29 @@ public class PackageProcessor {
         return packageTMP;
     }
 
+    @SneakyThrows
+    private Package packageAssembly(@NotNull Package packageA, @NotNull Package packageB, @NotNull JSONObject response) {
+        // сюда надо поставить рекурсию.
+
+        ObjectMapper mapper = new ObjectMapper();
+        Parameter requestParams = mapper.readValue(response.toString(), Parameter.class);
+        System.out.println(response.toString());
+
+//        for (Parameter parameterA : packageA.getResponseParams()) {
+//            if (parameterA.getFlag()) {
+//                for (Parameter parameterB : packageB.getRequestBody()) {
+//                    if (parameterB.getName().equals(parameterA.getNameB())) {
+//                        Parameter parameterTMP = parameterB;
+//                        parameterTMP.setValue(response.getString(parameterA.getName()));
+//                        packageB.getRequestBody().set(packageB.getRequestBody().indexOf(parameterB), parameterTMP);
+//                        break;
+//                    }
+//                }
+//            }
+//        }
+        return packageB;
+    }
+
     public void work(@NotNull LinkedPackage linkedPackage) throws ReceivingException, DispatchGETException, DispatchPOSTException {
         Package packageA = linkedPackage.getAPackage();
         Package packageB = linkedPackage.getBPackage();
@@ -115,9 +146,22 @@ public class PackageProcessor {
             JSONObject pack = RequestProcessor.createJson(packageA.getRequestBody());
             request = connectorA.sendPostRequest(systemConfigA.getDomain() +packageA.getUrl(), pack);
         }
+        System.err.println(request);
+        JSONObject response = null;
+        try {
+            response = new JSONObject(request);
+        } catch (JSONException e) {
+            System.err.println("Ответ получил не json");
+        }
+//        Package packageAnswer = packageAssembly(packageA, packageB, response);
+//        System.out.println(packageAnswer.getId());
+//        JSONObject pack = RequestProcessor.createJson(packageB.getRequestBody());
+        JSONObject pack = new  JSONObject();
+        pack.put("sting", "string");
+        request = connectorB.sendPostRequest(systemConfigB.getDomain() + packageB.getUrl(), pack);
         System.out.println(request);
-    }
 
+    }
 
     private void timerAuthorization(@NotNull SystemConfig systemConfig, ScheduledExecutorService timerAuthorization, AuthorizationManager authorizationManager) {
         if (systemConfig.getAuthorization().getTimeoutUpdate() > 0)

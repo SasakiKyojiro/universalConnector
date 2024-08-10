@@ -263,12 +263,7 @@
             ]
           }
         ],
-        "response_params": [
-          {
-            "type_param": "BOOLEAN",
-            "name": "status"
-          }
-        ]
+        "response_params": []
       },
       {
         "id": 1,
@@ -294,13 +289,13 @@
         "delay": 0,
         "path_variable": {},
         "request_params": [],
-        "request_body": [],
-        "response_params": [
+        "request_body": [
           {
             "type_param": "BOOLEAN",
             "name": "status"
           }
-        ]
+        ],
+        "response_params": []
       }
     ]
   }

@@ -7,10 +7,8 @@ import exception.AuthorizationTimeoutException;
 import exception.DispatchPOSTException;
 import exception.ReceivingException;
 import lombok.Getter;
-
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
@@ -18,7 +16,7 @@ public class AuthorizationManager {
     @Getter
     private String token;
     @Getter
-    private Boolean authenticated = false;
+    private boolean authenticated = false;
 
     private String domain;
     private ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
