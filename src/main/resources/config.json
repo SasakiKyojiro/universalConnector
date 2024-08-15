@@ -62,58 +62,53 @@
             "type_param": "STRING",
             "name": "device_name",
             "flag": true,
-            "name_b": "device_name",
-            "id_b": 0
+            "name_b": "device_name"
           },
           {
             "type_param": "STRING",
             "name": "description",
             "flag": true,
-            "name_b": "description",
-            "id_b": 0
+            "name_b": "description"
           },
           {
             "type_param": "OBJECT",
             "name": "rows",
+            "flag": true,
             "params": [
               {
                 "type_param": "STRING",
                 "name": "name",
                 "flag": true,
-                "name_b": "name",
-                "id_b": 0
+                "name_b": "name"
               },
               {
                 "type_param": "LIST|INT",
                 "name": "counter",
                 "flag": true,
-                "name_b": "counter",
-                "id_b": 0
+                "name_b": "counter"
               },
               {
                 "type_param": "LIST|OBJECT",
                 "name": "data",
+                "flag": true,
                 "params": [
                   {
                     "type_param": "DATETIME",
                     "name": "date",
                     "flag": true,
-                    "name_b": "date",
-                    "id_b": 0
+                    "name_b": "date"
                   },
                   {
                     "type_param": "BOOLEAN",
                     "name": "is_active",
                     "flag": true,
-                    "name_b": "is_active",
-                    "id_b": 0
+                    "name_b": "is_active"
                   },
                   {
                     "type_param": "INT",
                     "name": "value",
                     "flag": true,
-                    "name_b": "fsdf",
-                    "id_b": 0
+                    "name_b": "value"
                   }
                 ]
               }
