@@ -111,28 +111,8 @@ public class PackageProcessor {
         return packageTMP;
     }
 
-    @SneakyThrows
-    private Package packageAssembly(@NotNull Package packageA, @NotNull Package packageB, @NotNull JSONObject response) {
-        // сюда надо поставить рекурсию.
 
-        ObjectMapper mapper = new ObjectMapper();
-        Parameter requestParams = mapper.readValue(response.toString(), Parameter.class);
-        System.out.println(response.toString());
 
-//        for (Parameter parameterA : packageA.getResponseParams()) {
-//            if (parameterA.getFlag()) {
-//                for (Parameter parameterB : packageB.getRequestBody()) {
-//                    if (parameterB.getName().equals(parameterA.getNameB())) {
-//                        Parameter parameterTMP = parameterB;
-//                        parameterTMP.setValue(response.getString(parameterA.getName()));
-//                        packageB.getRequestBody().set(packageB.getRequestBody().indexOf(parameterB), parameterTMP);
-//                        break;
-//                    }
-//                }
-//            }
-//        }
-        return packageB;
-    }
 
     public void work(@NotNull LinkedPackage linkedPackage) throws ReceivingException, DispatchGETException, DispatchPOSTException {
         Package packageA = linkedPackage.getAPackage();
@@ -146,20 +126,15 @@ public class PackageProcessor {
             JSONObject pack = RequestProcessor.createJson(packageA.getRequestBody());
             request = connectorA.sendPostRequest(systemConfigA.getDomain() +packageA.getUrl(), pack);
         }
-        System.err.println(request);
         JSONObject response = null;
         try {
             response = new JSONObject(request);
         } catch (JSONException e) {
             System.err.println("Ответ получил не json");
         }
-//        Package packageAnswer = packageAssembly(packageA, packageB, response);
-//        System.out.println(packageAnswer.getId());
-//        JSONObject pack = RequestProcessor.createJson(packageB.getRequestBody());
-        JSONObject pack = new  JSONObject();
-        pack.put("sting", "string");
+        JSONObject jsonObject = PackageRecursiveHandler.recursivePackage(packageA.getResponseParams(), response);
+        JSONObject pack = PackageCollectorB.assembly(packageB.getRequestBody(), jsonObject);
         request = connectorB.sendPostRequest(systemConfigB.getDomain() + packageB.getUrl(), pack);
-        System.out.println(request);
 
     }
 

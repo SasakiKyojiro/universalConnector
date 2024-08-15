@@ -34,8 +34,6 @@ public class CustomDeserializer extends StdDeserializer<ParameterType> {
                 return ParameterType.BOOLEAN;
             case "INT":
                 return ParameterType.INT;
-            case "LIST":
-                return ParameterType.LIST;
             case "OBJECT":
                 return ParameterType.OBJECT;
             case "LIST|INT":

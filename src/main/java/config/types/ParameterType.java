@@ -9,7 +9,6 @@ public enum ParameterType {
     AUTH_TOKEN,
     BOOLEAN,
     INT,
-    LIST,
     OBJECT,
     LIST_INT,
     LIST_OBJECT
