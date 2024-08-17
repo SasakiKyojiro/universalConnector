@@ -1,5 +1,6 @@
 package client.connector;
 
+import config.types.SystemType;
 import exception.DispatchGETException;
 import exception.DispatchPOSTException;
 import exception.ReceivingException;
@@ -14,9 +15,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class Connector {
-    private Integer timeOut;
-    public Connector(Integer timeOut) {
+    private final Integer timeOut;
+    private final SystemType systemType;
+
+    public Connector(Integer timeOut, SystemType systemType) {
         this.timeOut = timeOut;
+        this.systemType = systemType;
     }
 
     public String sendGetRequest(String urlString) throws DispatchGETException, ReceivingException {
@@ -27,25 +31,25 @@ public class Connector {
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
         } catch (IOException e) {
-            throw new DispatchGETException(e.getMessage());
+            throw new DispatchGETException(e.getMessage(), systemType);
         }
         connection.setConnectTimeout(timeOut);
         return processingResponse(connection);
     }
 
     private String processingResponse(HttpURLConnection connection) throws ReceivingException {
-        BufferedReader reader = null;
+        BufferedReader reader;
         StringBuilder response;
         try {
             reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             response = new StringBuilder();
-            String line = "";
+            String line;
             while ((line = reader.readLine()) != null) {
                 response.append(line);
             }
             reader.close();
         } catch (IOException e) {
-            throw new ReceivingException(e.getMessage());
+            throw new ReceivingException(e.getMessage(), systemType);
         }
         connection.disconnect();
         return response.toString();
@@ -59,7 +63,7 @@ public class Connector {
             byte[] postData = requestBody.toString().getBytes();
             wr.write(postData);
         } catch (IOException e) {
-            throw new DispatchPOSTException(e.getMessage());
+            throw new DispatchPOSTException(e.getMessage(), systemType);
         }
         return processingResponse(connection);
 
@@ -74,7 +78,7 @@ public class Connector {
             connection.setConnectTimeout(timeOut);
             connection.setRequestMethod("POST");
         } catch (IOException e) {
-            throw new DispatchPOSTException(e.getMessage());
+            throw new DispatchPOSTException(e.getMessage(), systemType);
         }
         connection.setRequestProperty("Content-Type", "application/json");
         connection.setDoOutput(true);

@@ -10,10 +10,6 @@ import java.io.IOException;
 
 public class CustomDeserializer extends StdDeserializer<ParameterType> {
 
-    public CustomDeserializer() {
-        this(null);
-    }
-
     public CustomDeserializer(Class<?> vc) {
         super(vc);
     }
@@ -23,25 +19,16 @@ public class CustomDeserializer extends StdDeserializer<ParameterType> {
         JsonNode node = jp.getCodec().readTree(jp);
         String dataType = node.asText();
 
-        switch (dataType) {
-            case "STRING":
-                return ParameterType.STRING;
-            case "DATETIME":
-                return ParameterType.DATETIME;
-            case "AUTH_TOKEN":
-                return ParameterType.AUTH_TOKEN;
-            case "BOOLEAN":
-                return ParameterType.BOOLEAN;
-            case "INT":
-                return ParameterType.INT;
-            case "OBJECT":
-                return ParameterType.OBJECT;
-            case "LIST|INT":
-                return ParameterType.LIST_INT;
-            case "LIST|OBJECT":
-                return ParameterType.LIST_OBJECT;
-            default:
-                throw new IllegalArgumentException("Unknown data type: " + dataType);
-        }
+        return switch (dataType) {
+            case "STRING" -> ParameterType.STRING;
+            case "DATETIME" -> ParameterType.DATETIME;
+            case "AUTH_TOKEN" -> ParameterType.AUTH_TOKEN;
+            case "BOOLEAN" -> ParameterType.BOOLEAN;
+            case "INT" -> ParameterType.INT;
+            case "OBJECT" -> ParameterType.OBJECT;
+            case "LIST|INT" -> ParameterType.LIST_INT;
+            case "LIST|OBJECT" -> ParameterType.LIST_OBJECT;
+            default -> throw new IllegalArgumentException("Unknown data type: " + dataType);
+        };
     }
 }

@@ -9,8 +9,6 @@ import exception.ReceivingException;
 import lombok.Getter;
 import org.json.JSONObject;
 
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 public class AuthorizationManager {
     @Getter
@@ -18,12 +16,11 @@ public class AuthorizationManager {
     @Getter
     private boolean authenticated = false;
 
-    private String domain;
-    private ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
+    private final String domain;
     private String login;
     private String password;
-    private Connector connector;
-    private Authorization authorization;
+    private final Connector connector;
+    private final Authorization authorization;
 
     public AuthorizationManager(String domain, Connector connector, Authorization authorization) {
         this.domain = domain;
@@ -52,9 +49,7 @@ public class AuthorizationManager {
                 token = authorization.getParams().get(0).getValue();
                 authenticated = true;
             }
-            case NONE -> {
-                authenticated = true;
-            }
+            case NONE -> authenticated = true;
             default -> throw new IllegalStateException("Unexpected value: " + authorization.getType());
         }
 
@@ -76,7 +71,7 @@ public class AuthorizationManager {
                 break;
             } catch (DispatchPOSTException | ReceivingException e) {
                 retryCount++;
-                System.err.println("Error: " + "Время ожидания превышено " + domain);
+                System.err.println("Error: Время ожидания превышено к " + domain);
                 try {
                     Thread.sleep(10000);
                 } catch (InterruptedException ex) {
@@ -85,9 +80,8 @@ public class AuthorizationManager {
             }
         }
         if (retryCount == maxRetries) {
-            throw new AuthorizationTimeoutException("Превышен лимит попыток подключения");
+            throw new AuthorizationTimeoutException("Превышен лимит попыток подключения " + domain);
         }
-        String token = jsonResponse;
-        return token;
+        return jsonResponse;
     }
 }
