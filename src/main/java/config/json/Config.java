@@ -13,6 +13,8 @@ import lombok.Setter;
 public class Config {
     @JsonProperty("buffering_of_unsent_B_packets")
     private boolean buffering;
+    @JsonProperty("log_level")
+    private String logLevel;
     @JsonProperty("log_path")
     private String logPath;
     @JsonProperty("system_type_a")

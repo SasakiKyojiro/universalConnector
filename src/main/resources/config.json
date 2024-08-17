@@ -1,6 +1,7 @@
 {
   "buffering_of_unsent_B_packets": true,
   "log_path": "/src/logging_data",
+  "log_level": "Debug",
   "system_type_a": {
     "timeout": 1000,
     "domain": "http://localhost:8080",

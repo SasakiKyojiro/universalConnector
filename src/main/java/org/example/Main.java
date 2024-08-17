@@ -3,8 +3,15 @@ package org.example;
 import client.PackageProcessor;
 import config.json.Config;
 import config.parser.ConfigParser;
+import log.LevelLog;
+import log.LogUtil;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
+import static log.LevelLog.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -23,7 +30,16 @@ public class Main {
             System.err.println(e.getMessage());
         }
         if (config != null) {
-            PackageProcessor processor = new PackageProcessor(config);
+            Map<String, LevelLog> logLevelMap = new HashMap<>();
+            logLevelMap.put(Debug.toString(), Debug);
+            logLevelMap.put(Error.toString(), Error);
+            logLevelMap.put(Fatal.toString(), Fatal);
+            logLevelMap.put(Warning.toString(), Warning);
+
+            LevelLog level = logLevelMap.getOrDefault(config.getLogLevel(), Fatal);
+            LogUtil logUtil = new LogUtil(config.getLogPath(), level);
+            logUtil.log(Debug, "Запуск подключений к сервисам.");
+            PackageProcessor processor = new PackageProcessor(config, logUtil);
             processor.start();
 
         }
