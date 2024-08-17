@@ -7,7 +7,6 @@ import config.types.ParameterType;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class RequestProcessor {
@@ -18,7 +17,7 @@ public class RequestProcessor {
         if (pack.getMethod().equals(Method.POST)) {
             // Собираем JSON запрос из requestBody
             JSONObject jsonRequest = createJson(pack.getRequestBody());
-            urlBuilder.append(": ").append(jsonRequest.toString());
+            urlBuilder.append(": ").append(jsonRequest);
             requests = (urlBuilder.toString());
         } else if (pack.getMethod().equals(Method.GET)) {
             if (pack.getRequestParams().isEmpty()) {

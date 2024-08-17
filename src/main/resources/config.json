@@ -1,5 +1,5 @@
 {
-  "logging": true,
+  "buffering_of_unsent_B_packets": true,
   "log_path": "/src/logging_data",
   "system_type_a": {
     "timeout": 1000,

@@ -2,7 +2,7 @@ package client;
 
 
 import client.connector.Connector;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import client.connector.JsonFileManager;
 import config.json.Config;
 import config.json.Package;
 import config.json.Parameter;
@@ -16,12 +16,10 @@ import exception.AuthorizationTimeoutException;
 import exception.DispatchGETException;
 import exception.DispatchPOSTException;
 import exception.ReceivingException;
-import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.DataInput;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -40,47 +38,62 @@ public class PackageProcessor {
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
     private final ScheduledExecutorService timerAuthorizationA = Executors.newSingleThreadScheduledExecutor();
     private final ScheduledExecutorService timerAuthorizationB = Executors.newSingleThreadScheduledExecutor();
+    private final boolean buffering;
+    private JsonFileManager jsonHandler;
 
     public PackageProcessor(Config config) {
         packageList = PackageConnector.connectPackages(config);
 //        executor = new ScheduledThreadPoolExecutor(packageList.size());
         systemConfigA = config.getSystemTypeA();
         systemConfigB = config.getSystemTypeB();
-        connectorA = new Connector(systemConfigA.getTimeout());
-        connectorB = new Connector(systemConfigB.getTimeout());
+        connectorA = new Connector(systemConfigA.getTimeout(), SystemType.SYSTEM_TYPE_A);
+        connectorB = new Connector(systemConfigB.getTimeout(), SystemType.SYSTEM_TYPE_B);
         authorizationA = new AuthorizationManager(systemConfigA.getDomain(), connectorA, systemConfigA.getAuthorization());
         authorizationB = new AuthorizationManager(systemConfigB.getDomain(), connectorB, systemConfigB.getAuthorization());
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.out.println("Shutting down...");
+            if (config.isBuffering())
+                jsonHandler.saveJsonToFile();
             timerAuthorizationA.shutdownNow();
             timerAuthorizationB.shutdownNow();
             executor.shutdownNow();
         }));
+
+        if (config.isBuffering()) {
+            buffering = true;
+            jsonHandler = new JsonFileManager(config.getLogPath());
+        } else
+            buffering = false;
     }
+
 
     public void start() {
         timerAuthorization(systemConfigA, timerAuthorizationA, authorizationA);
         timerAuthorization(systemConfigB, timerAuthorizationB, authorizationB);
-        Integer count = 0;
         //ожидайка подключения
-        while (true) {
+        do {
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            if (authorizationA.isAuthenticated() && authorizationB.isAuthenticated()) break;
-        }
+        } while (!authorizationA.isAuthenticated() || !authorizationB.isAuthenticated());
         for (LinkedPackage linkedPackage : packageList) {
             executor.scheduleAtFixedRate(() -> {
                 try {
                     work(linkedPackage);
                 } catch (ReceivingException e) {
-                    System.err.println("Сломан у "+ linkedPackage.getAPackage().getId() + " приём пакетов " + e.getMessage());
+                    if (e.getMessage().contains(String.valueOf(SystemType.SYSTEM_TYPE_A)))
+                        stop(e);
+//                System.err.println("Сломан у " + linkedPackage.getAPackage().getId() + " приём пакетов " + e.getMessage());
                 } catch (DispatchGETException e) {
-                    System.err.println("Сломан у "+ linkedPackage.getAPackage().getId() + " отправка GET пакетов" + e.getMessage());
+                    if (e.getMessage().contains(String.valueOf(SystemType.SYSTEM_TYPE_A)))
+                        stop(e);
+//                System.err.println("Сломан у " + linkedPackage.getAPackage().getId() + " отправка GET пакетов" + e.getMessage());
                 } catch (DispatchPOSTException e) {
-                    System.err.println("Сломан у "+ linkedPackage.getAPackage().getId() + " отправка POST пакетов" + e.getMessage());
+                    if (e.getMessage().contains(String.valueOf(SystemType.SYSTEM_TYPE_A)))
+                        stop(e);
+//                System.err.println("Сломан у " + linkedPackage.getAPackage().getId() + " отправка POST пакетов" + e.getMessage());
                 }
             }, 0, systemConfigA.getPackagesDelay(), TimeUnit.MILLISECONDS);
         }
@@ -90,10 +103,10 @@ public class PackageProcessor {
     private Package packageCollector(@NotNull Package packageTMP, SystemType systemType) {
         for (Parameter parameter : packageTMP.getRequestParams()) {
             if (parameter.getValue().equals("AUTH_TOKEN")) {
-                if (systemType == SystemType.SYSTEM_TYPE_A) {
+                if (systemType.equals(SystemType.SYSTEM_TYPE_A)) {
                     parameter.setValue(authorizationA.getToken());
                 }
-                if (systemType == SystemType.SYSTEM_TYPE_B) {
+                if (systemType.equals(SystemType.SYSTEM_TYPE_B)) {
                     parameter.setValue(authorizationB.getToken());
                 }
             }
@@ -112,9 +125,7 @@ public class PackageProcessor {
     }
 
 
-
-
-    public void work(@NotNull LinkedPackage linkedPackage) throws ReceivingException, DispatchGETException, DispatchPOSTException {
+    private void work(@NotNull LinkedPackage linkedPackage) throws ReceivingException, DispatchGETException, DispatchPOSTException {
         Package packageA = linkedPackage.getAPackage();
         Package packageB = linkedPackage.getBPackage();
         String request = "";
@@ -124,7 +135,11 @@ public class PackageProcessor {
         }
         if (packageA.getMethod().equals(Method.POST)){
             JSONObject pack = RequestProcessor.createJson(packageA.getRequestBody());
-            request = connectorA.sendPostRequest(systemConfigA.getDomain() +packageA.getUrl(), pack);
+            try {
+                request = connectorA.sendPostRequest(systemConfigA.getDomain() + packageA.getUrl(), pack);
+            } catch (DispatchPOSTException e) {
+                throw new DispatchPOSTException(e.getMessage(), SystemType.SYSTEM_TYPE_A);
+            }
         }
         JSONObject response = null;
         try {
@@ -132,10 +147,28 @@ public class PackageProcessor {
         } catch (JSONException e) {
             System.err.println("Ответ получил не json");
         }
+        assert response != null;
         JSONObject jsonObject = PackageRecursiveHandler.recursivePackage(packageA.getResponseParams(), response);
         JSONObject pack = PackageCollectorB.assembly(packageB.getRequestBody(), jsonObject);
-        request = connectorB.sendPostRequest(systemConfigB.getDomain() + packageB.getUrl(), pack);
+        try {
+            loadingFromBuffer(packageB);
+            connectorB.sendPostRequest(systemConfigB.getDomain() + packageB.getUrl(), pack);
+        } catch (DispatchPOSTException e) {
+            if (buffering) jsonHandler.addJsonData(packageB.getId(), pack);
+        }
 
+    }
+
+    private void loadingFromBuffer(Package packageB) throws ReceivingException, DispatchPOSTException {
+        if (buffering) {
+            while (!jsonHandler.getJsonData().isEmpty()) {
+                JSONObject jsonObject = jsonHandler.getFirstJsonObjectFromFile(packageB.getId());
+                if (jsonObject != null) {
+                    connectorB.sendPostRequest(systemConfigB.getDomain() + packageB.getUrl(), jsonObject);
+                    jsonHandler.deleteFirstJsonObjectFromFile(packageB.getId());
+                } else break;
+            }
+        }
     }
 
     private void timerAuthorization(@NotNull SystemConfig systemConfig, ScheduledExecutorService timerAuthorization, AuthorizationManager authorizationManager) {
