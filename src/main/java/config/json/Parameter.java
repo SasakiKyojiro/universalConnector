@@ -22,8 +22,6 @@ public class Parameter {
     private String value;
     @JsonProperty("name_b")
     private String nameB;
-    @JsonProperty("id_b")
-    private Integer idB;
     @JsonProperty("flag")
     private Boolean flag;
     @JsonProperty("params")

@@ -135,8 +135,7 @@
             "type_param": "DATETIME",
             "name": "current-date",
             "flag": true,
-            "name_b": "current-date",
-            "id_b": 1
+            "name_b": "current-date"
           }
         ]
       },
@@ -181,8 +180,7 @@
             "type_param": "BOOLEAN",
             "name": "status",
             "flag": true,
-            "name_b": "status",
-            "id_b": 2
+            "name_b": "status"
           }
         ]
       }
