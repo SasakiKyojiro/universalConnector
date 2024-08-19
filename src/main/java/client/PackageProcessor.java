@@ -41,7 +41,7 @@ public class PackageProcessor {
     private final ScheduledExecutorService timerAuthorizationA = Executors.newSingleThreadScheduledExecutor();
     private final ScheduledExecutorService timerAuthorizationB = Executors.newSingleThreadScheduledExecutor();
     private final LogUtil logUtil;
-    private final boolean buffering;
+    private final Boolean buffering;
     private JsonFileManager jsonHandler;
 
     public PackageProcessor(Config config, LogUtil logUtil) {
@@ -82,21 +82,14 @@ public class PackageProcessor {
                 throw new RuntimeException(e);
             }
         } while (!authorizationA.isAuthenticated() || !authorizationB.isAuthenticated());
-        for (LinkedPackage linkedPackage : packageList) {
-            executor.scheduleAtFixedRate(() -> {
-                work(linkedPackage);
-            }, 0, systemConfigA.getPackagesDelay(), TimeUnit.MILLISECONDS);
-        }
-
+        for (LinkedPackage linkedPackage : packageList)
+            executor.scheduleAtFixedRate(() -> work(linkedPackage), 0, systemConfigA.getPackagesDelay(), TimeUnit.MILLISECONDS);
     }
 
-    private Package packageCollector(@NotNull Package packageTMP, SystemType systemType) {
+    private Package packageCollector(@NotNull Package packageTMP) {
         for (Parameter parameter : packageTMP.getRequestParams()) {
             if (parameter.getValue().equals("AUTH_TOKEN")) {
-                if (systemType.equals(SystemType.SYSTEM_TYPE_A))
-                    parameter.setValue(authorizationA.getToken());
-                if (systemType.equals(SystemType.SYSTEM_TYPE_B))
-                    parameter.setValue(authorizationB.getToken());
+                parameter.setValue(authorizationA.getToken());
             }
             if (parameter.getValue().contains("NOW")) {
                 String searchText = "|format|";
@@ -118,7 +111,7 @@ public class PackageProcessor {
         String request = "";
         try {
             if (packageA.getMethod().equals(Method.GET)) {
-                String pack = systemConfigA.getDomain() + RequestProcessor.createUrl(packageCollector(packageA, SystemType.SYSTEM_TYPE_A));
+                String pack = systemConfigA.getDomain() + RequestProcessor.createUrl(packageCollector(packageA));
                 request = connectorA.sendGetRequest(pack);
             }
             if (packageA.getMethod().equals(Method.POST)) {

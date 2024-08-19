@@ -45,10 +45,6 @@ public class JsonFileManager {
         }
     }
 
-    private static JSONObject extractFirstField(JSONArray jsonObject) {
-        return jsonObject.getJSONObject(0);
-    }
-
     @SneakyThrows
     public void addJsonData(int id, JSONObject jsonObject) {
         String key = String.valueOf(id);
@@ -77,8 +73,8 @@ public class JsonFileManager {
 
     public JSONObject getFirstJsonObjectFromFile(int id) {
         String key = String.valueOf(id);
-        if (jsonData.has(key) && jsonData.getJSONArray(key).length() > 0) {
-            return extractFirstField(jsonData.getJSONArray(key));
+        if (jsonData.has(key) && !jsonData.getJSONArray(key).isEmpty()) {
+            return jsonData.getJSONArray(key).getJSONObject(0);
         }
         return null;
     }

@@ -37,6 +37,19 @@ public class Connector {
         return processingResponse(connection);
     }
 
+    public String sendPostRequest(String urlString, JSONObject requestBody) throws DispatchPOSTException, ReceivingException {
+        HttpURLConnection connection = getHttpURLConnection(urlString);
+        DataOutputStream wr;
+        try {
+            wr = new DataOutputStream(connection.getOutputStream());
+            byte[] postData = requestBody.toString().getBytes();
+            wr.write(postData);
+        } catch (IOException e) {
+            throw new DispatchPOSTException(e.getMessage(), systemType);
+        }
+        return processingResponse(connection);
+    }
+
     private String processingResponse(HttpURLConnection connection) throws ReceivingException {
         BufferedReader reader;
         StringBuilder response;
@@ -53,20 +66,6 @@ public class Connector {
         }
         connection.disconnect();
         return response.toString();
-    }
-
-    public String sendPostRequest(String urlString, JSONObject requestBody) throws DispatchPOSTException, ReceivingException {
-        HttpURLConnection connection = getHttpURLConnection(urlString);
-        DataOutputStream wr;
-        try {
-            wr = new DataOutputStream(connection.getOutputStream());
-            byte[] postData = requestBody.toString().getBytes();
-            wr.write(postData);
-        } catch (IOException e) {
-            throw new DispatchPOSTException(e.getMessage(), systemType);
-        }
-        return processingResponse(connection);
-
     }
 
     private @NotNull HttpURLConnection getHttpURLConnection(String urlString) throws DispatchPOSTException {
