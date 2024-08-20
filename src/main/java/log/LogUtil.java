@@ -24,7 +24,7 @@ public class LogUtil {
     }
 
     public void log(LevelLog logLevel, String message) {
-        if (this.logLevel <= map.get(logLevel)) {
+        if (this.logLevel >= map.get(logLevel)) {
             LocalDateTime currentDateTime = LocalDateTime.now();
 
             // Создаем объект DateTimeFormatter для форматирования даты
