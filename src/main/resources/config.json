@@ -9,6 +9,7 @@
     "authorization": {
       "type": "AUTH_TOKEN",
       "name": "token",
+      "url": "/login",
       "need_loging": true,
       "method": "POST",
       "params": [

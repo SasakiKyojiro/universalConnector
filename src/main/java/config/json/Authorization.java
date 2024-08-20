@@ -20,6 +20,8 @@ public class Authorization {
     private boolean needLogging;
     @JsonProperty("method")
     private String method;
+    @JsonProperty("url")
+    private String url;
     @JsonProperty("name")
     private String name;
     @JsonProperty("params")

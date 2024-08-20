@@ -49,7 +49,6 @@ public class Main {
             logUtil.log(Debug, "Запуск подключений к сервисам.");
             PackageProcessor processor = new PackageProcessor(config, logUtil);
             processor.start();
-
         }
     }
 }

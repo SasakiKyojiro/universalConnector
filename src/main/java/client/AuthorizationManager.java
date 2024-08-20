@@ -66,7 +66,7 @@ public class AuthorizationManager {
         int retryCount = 0;
         while (retryCount < maxRetries) {
             try {
-                jsonResponse = connector.sendPostRequest(domain + "/login", json);
+                jsonResponse = connector.sendPostRequest(domain + authorization.getUrl(), json);
                 System.out.println("Авторизован");
                 break;
             } catch (DispatchPOSTException | ReceivingException e) {
