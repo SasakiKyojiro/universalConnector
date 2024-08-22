@@ -33,7 +33,7 @@ public class RequestProcessor {
                         urlBuilder.append(param.getName()).append("=").append(param.getValueTMP());
                 }
             }
-            requests = (urlBuilder.toString().replaceAll(" ", "%20").replaceAll(":", "%3A"));
+            requests = formatting(urlBuilder.toString());
 
         return requests;
     }
@@ -48,7 +48,11 @@ public class RequestProcessor {
                 jsonObject.remove(param.getName());
             }
         }
-        return urlBuilder.toString();
+        return formatting(urlBuilder.toString());
+    }
+
+    private static String formatting(String input) {
+        return input.replaceAll(" ", "%20").replaceAll(":", "%3A");
     }
 
     public static @NotNull JSONObject createJson(@NotNull List<Parameter> params) {

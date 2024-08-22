@@ -14,6 +14,7 @@ public class QualityInspector {
             AssistantQualityInspector assistantQualityInspector = new AssistantQualityInspector();
             assistantQualityInspector.recursiveCollectionOfPackageFieldsA(linkedPackage.getAPackage().getResponseParams());
             assistantQualityInspector.recursiveCollectionOfPackageFieldsB(linkedPackage.getBPackage().getRequestBody());
+            assistantQualityInspector.recursiveCollectionOfPackageFieldsB(linkedPackage.getBPackage().getRequestParams());
             if (!assistantQualityInspector.comparison())
                 result = false;
         }

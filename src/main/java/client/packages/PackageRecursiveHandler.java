@@ -48,17 +48,17 @@ public class PackageRecursiveHandler {
 
     private static void parsing(@NotNull JSONObject response, JSONObject packageJSON, @NotNull Parameter parameter) {
         if (parameter.getTypeParam().equals(ParameterType.STRING)) {
-            packageJSON.put(parameter.getNameB(), response.getString(parameter.getNameB()));
+            packageJSON.put(parameter.getNameB(), response.getString(parameter.getName()));
         } else if (parameter.getTypeParam().equals(ParameterType.LIST_INT)) {
-            packageJSON.put(parameter.getNameB(), response.getJSONArray(parameter.getNameB()));
+            packageJSON.put(parameter.getNameB(), response.getJSONArray(parameter.getName()));
         } else if (parameter.getTypeParam().equals(ParameterType.INT)) {
-            packageJSON.put(parameter.getNameB(), response.getInt(parameter.getNameB()));
+            packageJSON.put(parameter.getNameB(), response.getInt(parameter.getName()));
         } else if (parameter.getTypeParam().equals(ParameterType.BOOLEAN)) {
-            packageJSON.put(parameter.getNameB(), response.getBoolean(parameter.getNameB()));
+            packageJSON.put(parameter.getNameB(), response.getBoolean(parameter.getName()));
         } else if (parameter.getTypeParam().equals(ParameterType.DATETIME)) {
-            packageJSON.put(parameter.getNameB(), response.getString(parameter.getNameB()));
+            packageJSON.put(parameter.getNameB(), response.getString(parameter.getName()));
         } else if (parameter.getTypeParam().equals(ParameterType.AUTH_TOKEN)) {
-            packageJSON.put(parameter.getNameB(), response.getString(parameter.getNameB()));
+            packageJSON.put(parameter.getNameB(), response.getString(parameter.getName()));
         }
     }
 }
