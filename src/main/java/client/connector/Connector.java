@@ -3,8 +3,8 @@ package client.connector;
 import config.types.SystemType;
 import exception.DispatchGETException;
 import exception.DispatchPOSTException;
+import exception.DispatchPUTException;
 import exception.ReceivingException;
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -12,6 +12,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 
 public class Connector {
@@ -38,14 +40,45 @@ public class Connector {
     }
 
     public String sendPostRequest(String urlString, JSONObject requestBody) throws DispatchPOSTException, ReceivingException {
-        HttpURLConnection connection = getHttpURLConnection(urlString);
-        DataOutputStream wr;
+        URL url;
+        HttpURLConnection connection;
         try {
+            url = new URL(urlString);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setConnectTimeout(timeOut);
+            connection.setRequestMethod("POST");
+
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+            DataOutputStream wr;
+
             wr = new DataOutputStream(connection.getOutputStream());
             byte[] postData = requestBody.toString().getBytes();
             wr.write(postData);
         } catch (IOException e) {
             throw new DispatchPOSTException(e.getMessage(), systemType);
+        }
+        return processingResponse(connection);
+    }
+
+    public String sendPutRequest(String urlString, JSONObject requestBody) throws DispatchPUTException, ReceivingException {
+        URL url;
+        HttpURLConnection connection;
+        try {
+            url = new URL(urlString);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setConnectTimeout(timeOut);
+            connection.setRequestMethod("PUT");
+
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+            DataOutputStream wr;
+
+            wr = new DataOutputStream(connection.getOutputStream());
+            byte[] postData = requestBody.toString().getBytes();
+            wr.write(postData);
+        } catch (IOException e) {
+            throw new DispatchPUTException(e.getMessage(), systemType);
         }
         return processingResponse(connection);
     }
@@ -66,21 +99,5 @@ public class Connector {
         }
         connection.disconnect();
         return response.toString();
-    }
-
-    private @NotNull HttpURLConnection getHttpURLConnection(String urlString) throws DispatchPOSTException {
-        URL url;
-        HttpURLConnection connection;
-        try {
-            url = new URL(urlString);
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setConnectTimeout(timeOut);
-            connection.setRequestMethod("POST");
-        } catch (IOException e) {
-            throw new DispatchPOSTException(e.getMessage(), systemType);
-        }
-        connection.setRequestProperty("Content-Type", "application/json");
-        connection.setDoOutput(true);
-        return connection;
     }
 }
