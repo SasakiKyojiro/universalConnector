@@ -16,10 +16,9 @@ import static log.LevelLog.*;
 
 public class Main {
     public static void main(String[] args) {
-        String configFilePath = "config.json";  // Путь к файлу конфигурации
+        String configFilePath = "config.json";
         Config config = null;
         boolean parsedItCorrectly = false;
-//        LogUtil logger = new LogUtil();
         try {
             System.out.println("Начат парсинг");
             ConfigParser configParser = new ConfigParser();
@@ -29,10 +28,9 @@ public class Main {
                 if(parsedItCorrectly){
                     parsedItCorrectly = QualityInspector.qualityInspector(config);
                     if(!parsedItCorrectly){
-                        System.err.println("Ошибка в заполнении одного из пакетов в \"packages\"");
+                        System.err.println("Error filling in one of the packages in \"packages\"");
                     }
                 }
-//                logger.log(config.getLog_path(), "Starting connector");
             }
         } catch (IOException e) {
             System.err.println(e.getMessage());
@@ -46,7 +44,7 @@ public class Main {
 
             LevelLog level = logLevelMap.get(config.getLogLevel());
             LogUtil logUtil = new LogUtil(config.getLogPath(), level);
-            logUtil.log(Debug, "Запуск подключений к сервисам.");
+            logUtil.log(Debug, "Launching service connections.");
             PackageProcessor processor = new PackageProcessor(config, logUtil);
             processor.start();
         }

@@ -120,7 +120,7 @@ public class PackageProcessor {
             try {
                 response = new JSONObject(request);
             } catch (JSONException e) {
-                logUtil.log(Warning, "Ответ получен, но не формата json от системы А. ID пакета: " + packageA.getId());
+                logUtil.log(Warning, "The response was received, but not in json format from the system A. Package ID: " + packageA.getId());
             }
             if (response != null) {
                 JSONObject jsonObject = PackageRecursiveHandler.recursivePackage(packageA.getResponseParams(), response);
@@ -144,7 +144,7 @@ public class PackageProcessor {
                     }
 
                 } catch (Exception e) {
-                    logUtil.log(Error, "Нет подключения к системе Б. Ошибка: " + e.getMessage());
+                    logUtil.log(Error, "There is no connection to system B. Error: " + e.getMessage());
                     System.err.println("Package B " + packageB.getId() + " no connect " + e.getMessage());
                     if (buffering) jsonHandler.addJsonData(packageB.getId(), jsonObject);
 
@@ -195,7 +195,7 @@ public class PackageProcessor {
             try {
                 authorizationManager.authorize();
             } catch (AuthorizationTimeoutException e) {
-                logUtil.log(Fatal, "Превышено время ожидания авторизации у " + systemConfig.getDomain());
+                logUtil.log(Fatal, "The waiting time for authorization has been exceeded " + systemConfig.getDomain());
                 stop(e);
             }
             }, 0, systemConfig.getAuthorization().getTimeoutUpdate(), TimeUnit.SECONDS);
@@ -203,7 +203,7 @@ public class PackageProcessor {
             try {
                 authorizationManager.authorize();
             } catch (AuthorizationTimeoutException e) {
-                logUtil.log(Fatal, "Ошибка подключения/авторизации к " + systemConfig.getDomain());
+                logUtil.log(Fatal, "Connection/authorization error to " + systemConfig.getDomain());
                 stop(e);
             }
         }

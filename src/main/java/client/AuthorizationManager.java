@@ -67,11 +67,9 @@ public class AuthorizationManager {
         while (retryCount < maxRetries) {
             try {
                 jsonResponse = connector.sendPostRequest(domain + authorization.getUrl(), json);
-                System.out.println("Авторизован");
                 break;
             } catch (DispatchPostException | ReceivingException e) {
                 retryCount++;
-                System.err.println("Error: Время ожидания превышено к " + domain);
                 try {
                     Thread.sleep(10000);
                 } catch (InterruptedException ex) {
@@ -80,7 +78,7 @@ public class AuthorizationManager {
             }
         }
         if (retryCount == maxRetries) {
-            throw new AuthorizationTimeoutException("Превышен лимит попыток подключения " + domain);
+            throw new AuthorizationTimeoutException("Connection attempt limit exceeded " + domain);
         }
         return jsonResponse;
     }
