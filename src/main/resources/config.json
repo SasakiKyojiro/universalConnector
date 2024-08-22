@@ -215,12 +215,13 @@
         "url": "/api/v1/send-data",
         "delay": 0,
         "path_variable": {},
-        "request_params": [],
-        "request_body": [
+        "request_params": [
           {
             "type_param": "STRING",
             "name": "device_name"
-          },
+          }
+        ],
+        "request_body": [
           {
             "type_param": "STRING",
             "name": "description"
