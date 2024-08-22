@@ -1,5 +1,6 @@
-package client;
+package client.packages;
 
+import client.AuthorizationManager;
 import client.connector.Connector;
 import client.connector.JsonFileManager;
 import config.json.Config;
@@ -11,10 +12,7 @@ import config.packages.PackageConnector;
 import config.packages.RequestProcessor;
 import config.types.Method;
 import config.types.SystemType;
-import exception.AuthorizationTimeoutException;
-import exception.DispatchGETException;
-import exception.DispatchPOSTException;
-import exception.ReceivingException;
+import exception.*;
 import log.LogUtil;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
@@ -89,7 +87,7 @@ public class PackageProcessor {
     private Package packageCollector(@NotNull Package packageTMP) {
         for (Parameter parameter : packageTMP.getRequestParams()) {
             if (parameter.getValue().equals("AUTH_TOKEN")) {
-                parameter.setValue(authorizationA.getToken());
+                parameter.setValueTMP(authorizationA.getToken());
             }
             if (parameter.getValue().contains("NOW")) {
                 String searchText = "|format|";
@@ -99,7 +97,7 @@ public class PackageProcessor {
                         .ofPattern(parameter
                                 .getValue()
                                 .substring(index + searchText.length()));
-                parameter.setValue(currentDateTime.format(formatter));
+                parameter.setValueTMP(currentDateTime.format(formatter));
             }
         }
         return packageTMP;
@@ -126,16 +124,32 @@ public class PackageProcessor {
             }
             if (response != null) {
                 JSONObject jsonObject = PackageRecursiveHandler.recursivePackage(packageA.getResponseParams(), response);
-                JSONObject pack = PackageCollectorB.assembly(packageB.getRequestBody(), jsonObject);
+                jsonObject = PackageCollectorB.incompleteAssembler(jsonObject);
                 try {
                     loadingFromBuffer(packageB);
-                    connectorB.sendPostRequest(systemConfigB.getDomain() + packageB.getUrl(), pack);
-                } catch (DispatchPOSTException e) {
+                    String url = packageB.getUrl();
+                    if (!packageB.getRequestParams().isEmpty())
+                        url = RequestProcessor.assemblyUrl(packageB, jsonObject);
+                    url = systemConfigB.getDomain() + url;
+                    if (packageB.getMethod().equals(Method.POST)) {
+                        JSONObject pack = PackageCollectorB.assembly(packageB.getRequestBody(), jsonObject);
+                        connectorB.sendPostRequest(url, pack);
+                    }
+                    if (packageB.getMethod().equals(Method.GET)) {
+                        connectorB.sendGetRequest(url);
+                    }
+                    if (packageB.getMethod().equals(Method.PUT)) {
+                        JSONObject pack = PackageCollectorB.assembly(packageB.getRequestBody(), jsonObject);
+                        connectorB.sendPutRequest(url, pack);
+                    }
+
+                } catch (DispatchPostException | DispatchPutException e) {
                     logUtil.log(Error, "Нет подключения к системе Б");
-                    if (buffering) jsonHandler.addJsonData(packageB.getId(), pack);
+                    System.err.println("Package B " + packageB.getId() + " no connect");
+                    if (buffering) jsonHandler.addJsonData(packageB.getId(), jsonObject);
                 }
             }
-        } catch (ReceivingException | DispatchGETException | DispatchPOSTException e) {
+        } catch (ReceivingException | DispatchGetException | DispatchPostException e) {
             if (e.getMessage().contains(String.valueOf(SystemType.SYSTEM_TYPE_A))) {
                 logUtil.log(Fatal, e.getMessage());
                 stop(e);
@@ -144,13 +158,29 @@ public class PackageProcessor {
 
     }
 
-    private void loadingFromBuffer(Package packageB) throws ReceivingException, DispatchPOSTException {
+    private void loadingFromBuffer(Package packageB) throws
+            ReceivingException, DispatchPostException, DispatchGetException, DispatchPutException {
         if (buffering) {
             while (!jsonHandler.getJsonData().isEmpty()) {
                 JSONObject jsonObject = jsonHandler.getFirstJsonObjectFromFile(packageB.getId());
                 if (jsonObject != null) {
-                    connectorB.sendPostRequest(systemConfigB.getDomain() + packageB.getUrl(), jsonObject);
-                    jsonHandler.deleteFirstJsonObjectFromFile(packageB.getId());
+                    String url = packageB.getUrl();
+                    if (!packageB.getRequestParams().isEmpty()){
+                        url = RequestProcessor.assemblyUrl(packageB, jsonObject);
+                    }
+                    url = systemConfigB.getDomain() + url;
+                    if (packageB.getMethod().equals(Method.POST)) {
+                        connectorB.sendPostRequest(url, jsonObject);
+                        jsonHandler.deleteFirstJsonObjectFromFile(packageB.getId());
+                    }
+                    if (packageB.getMethod().equals(Method.GET)) {
+                        connectorB.sendGetRequest(url);
+                        jsonHandler.deleteFirstJsonObjectFromFile(packageB.getId());
+                    }
+                    if (packageB.getMethod().equals(Method.PUT)) {
+                        connectorB.sendPutRequest(url, jsonObject);
+                        jsonHandler.deleteFirstJsonObjectFromFile(packageB.getId());
+                    }
                 } else break;
             }
         }

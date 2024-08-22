@@ -1,4 +1,4 @@
-package client;
+package client.packages;
 
 import config.json.Parameter;
 import config.types.ParameterType;

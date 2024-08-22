@@ -1,4 +1,4 @@
-package client;
+package client.packages;
 
 import config.json.Parameter;
 import config.types.ParameterType;
@@ -12,13 +12,18 @@ import java.util.List;
 import java.util.Map;
 
 public class PackageCollectorB {
-    public static JSONObject assembly(List<Parameter> parameters, JSONObject answerAServer) {
-        JSONObject result = new JSONObject();
+    public  static JSONObject incompleteAssembler (@NotNull JSONObject answerAServer){
         Map<String, JSONArray> resultMap = new HashMap<>();
         processJsonObject(answerAServer, resultMap);
         JSONObject tmp = new JSONObject(resultMap);
         resultMap.clear();
         processJson(tmp);
+        return tmp;
+    }
+
+    public static JSONObject assembly(List<Parameter> parameters, JSONObject answerAServer) {
+        JSONObject result = new JSONObject();
+        JSONObject tmp = incompleteAssembler(answerAServer);
         JSONObject listObject = new JSONObject();
         listObjectAssembler(parameters, tmp, listObject);
         jsonPackageCollector(parameters, tmp, listObject, result);
@@ -70,36 +75,35 @@ public class PackageCollectorB {
         for (String key : json.keySet()) {
             Object value = json.get(key);
 
-            if (value instanceof JSONObject) {
+            if (value instanceof JSONObject)
                 processJson((JSONObject) value); // Рекурсивный вызов для объектов
-            } else if (value instanceof JSONArray jsonArray) {
+            else if (value instanceof JSONArray jsonArray)
                 if (jsonArray.length() == 1) {
                     Object newValue = jsonArray.get(0);
                     json.put(key, newValue); // Заменяем JSON массив на его единственный элемент
                 }
-            }
         }
     }
 
     private static void processJsonObject(@NotNull JSONObject jsonObject, Map<String, JSONArray> resultMap) throws JSONException {
         for (String key : jsonObject.keySet()) {
             Object value = jsonObject.get(key);
-            if (value instanceof JSONObject) {
+            if (value instanceof JSONObject)
                 processJsonObject((JSONObject) value, resultMap);
-            } else if (value instanceof JSONArray jsonArray) {
+            else if (value instanceof JSONArray jsonArray) {
                 for (int i = 0; i < jsonArray.length(); i++) {
                     Object innerObj = jsonArray.get(i);
-                    if (innerObj instanceof JSONObject innerJsonObject) {
+                    if (innerObj instanceof JSONObject innerJsonObject)
                         for (String innerKey : innerJsonObject.keySet()) {
-                            if (resultMap.containsKey(innerKey)) {
+                            if (resultMap.containsKey(innerKey))
                                 resultMap.get(innerKey).put(innerJsonObject.get(innerKey));
-                            } else {
+                            else {
                                 JSONArray newArray = new JSONArray();
                                 newArray.put(innerJsonObject.get(innerKey));
                                 resultMap.put(innerKey, newArray);
                             }
                         }
-                    } else {
+                     else {
                         resultMap.put(key, jsonArray);
                         break;
                     }
@@ -111,5 +115,4 @@ public class PackageCollectorB {
             }
         }
     }
-
 }

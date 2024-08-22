@@ -1,9 +1,9 @@
 package client.connector;
 
 import config.types.SystemType;
-import exception.DispatchGETException;
-import exception.DispatchPOSTException;
-import exception.DispatchPUTException;
+import exception.DispatchGetException;
+import exception.DispatchPostException;
+import exception.DispatchPutException;
 import exception.ReceivingException;
 import org.json.JSONObject;
 
@@ -12,8 +12,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 
 public class Connector {
@@ -25,7 +23,7 @@ public class Connector {
         this.systemType = systemType;
     }
 
-    public String sendGetRequest(String urlString) throws DispatchGETException, ReceivingException {
+    public String sendGetRequest(String urlString) throws DispatchGetException, ReceivingException {
         URL url;
         HttpURLConnection connection;
         try {
@@ -33,13 +31,13 @@ public class Connector {
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
         } catch (IOException e) {
-            throw new DispatchGETException(e.getMessage(), systemType);
+            throw new DispatchGetException(e.getMessage(), systemType);
         }
         connection.setConnectTimeout(timeOut);
         return processingResponse(connection);
     }
 
-    public String sendPostRequest(String urlString, JSONObject requestBody) throws DispatchPOSTException, ReceivingException {
+    public String sendPostRequest(String urlString, JSONObject requestBody) throws DispatchPostException, ReceivingException {
         URL url;
         HttpURLConnection connection;
         try {
@@ -56,12 +54,12 @@ public class Connector {
             byte[] postData = requestBody.toString().getBytes();
             wr.write(postData);
         } catch (IOException e) {
-            throw new DispatchPOSTException(e.getMessage(), systemType);
+            throw new DispatchPostException(e.getMessage(), systemType);
         }
         return processingResponse(connection);
     }
 
-    public String sendPutRequest(String urlString, JSONObject requestBody) throws DispatchPUTException, ReceivingException {
+    public String sendPutRequest(String urlString, JSONObject requestBody) throws DispatchPutException, ReceivingException {
         URL url;
         HttpURLConnection connection;
         try {
@@ -78,7 +76,7 @@ public class Connector {
             byte[] postData = requestBody.toString().getBytes();
             wr.write(postData);
         } catch (IOException e) {
-            throw new DispatchPUTException(e.getMessage(), systemType);
+            throw new DispatchPutException(e.getMessage(), systemType);
         }
         return processingResponse(connection);
     }

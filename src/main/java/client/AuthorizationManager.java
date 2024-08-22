@@ -4,7 +4,7 @@ import client.connector.Connector;
 import config.json.Authorization;
 import config.json.Parameter;
 import exception.AuthorizationTimeoutException;
-import exception.DispatchPOSTException;
+import exception.DispatchPostException;
 import exception.ReceivingException;
 import lombok.Getter;
 import org.json.JSONObject;
@@ -69,7 +69,7 @@ public class AuthorizationManager {
                 jsonResponse = connector.sendPostRequest(domain + authorization.getUrl(), json);
                 System.out.println("Авторизован");
                 break;
-            } catch (DispatchPOSTException | ReceivingException e) {
+            } catch (DispatchPostException | ReceivingException e) {
                 retryCount++;
                 System.err.println("Error: Время ожидания превышено к " + domain);
                 try {

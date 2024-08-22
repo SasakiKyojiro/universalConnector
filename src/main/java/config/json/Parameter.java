@@ -20,6 +20,7 @@ public class Parameter {
     private String name;
     @JsonProperty("value")
     private String value;
+    private String valueTMP;
     @JsonProperty("name_b")
     private String nameB;
     @JsonProperty("flag")

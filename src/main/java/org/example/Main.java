@@ -1,6 +1,6 @@
 package org.example;
 
-import client.PackageProcessor;
+import client.packages.PackageProcessor;
 import config.inspector.AvailabilityInspector;
 import config.inspector.QualityInspector;
 import config.json.Config;
