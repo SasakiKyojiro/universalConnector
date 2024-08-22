@@ -1,14 +1,12 @@
 package client.connector;
 
 import lombok.Getter;
-import lombok.SneakyThrows;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.io.*;
-import java.util.Iterator;
 
 public class JsonFileManager {
     private final String filePath;
@@ -45,7 +43,6 @@ public class JsonFileManager {
         }
     }
 
-    @SneakyThrows
     public void addJsonData(int id, JSONObject jsonObject) {
         String key = String.valueOf(id);
         if (jsonData.has(key)) {

@@ -45,7 +45,6 @@ public class RequestProcessor {
             for (Parameter param : pack.getRequestParams()) {
                 if (!urlBuilder.isEmpty() && urlBuilder.charAt(urlBuilder.length() - 1) != '?') urlBuilder.append("&");
                 urlBuilder.append(param.getName()).append("=").append(jsonObject.get(param.getName()));
-                jsonObject.remove(param.getName());
             }
         }
         return formatting(urlBuilder.toString());

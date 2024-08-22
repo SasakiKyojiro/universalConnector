@@ -125,12 +125,12 @@ public class PackageProcessor {
             if (response != null) {
                 JSONObject jsonObject = PackageRecursiveHandler.recursivePackage(packageA.getResponseParams(), response);
                 jsonObject = PackageCollectorB.incompleteAssembler(jsonObject);
+                String url = packageB.getUrl();
+                if (!packageB.getRequestParams().isEmpty())
+                    url = RequestProcessor.assemblyUrl(packageB, jsonObject);
+                url = systemConfigB.getDomain() + url;
                 try {
                     loadingFromBuffer(packageB);
-                    String url = packageB.getUrl();
-                    if (!packageB.getRequestParams().isEmpty())
-                        url = RequestProcessor.assemblyUrl(packageB, jsonObject);
-                    url = systemConfigB.getDomain() + url;
                     if (packageB.getMethod().equals(Method.POST)) {
                         JSONObject pack = PackageCollectorB.assembly(packageB.getRequestBody(), jsonObject);
                         connectorB.sendPostRequest(url, pack);
@@ -143,10 +143,12 @@ public class PackageProcessor {
                         connectorB.sendPutRequest(url, pack);
                     }
 
-                } catch (DispatchPostException | DispatchPutException e) {
-                    logUtil.log(Error, "Нет подключения к системе Б");
-                    System.err.println("Package B " + packageB.getId() + " no connect");
+                } catch (Exception e) {
+                    logUtil.log(Error, "Нет подключения к системе Б. Ошибка: " + e.getMessage());
+                    System.err.println("Package B " + packageB.getId() + " no connect " + e.getMessage());
                     if (buffering) jsonHandler.addJsonData(packageB.getId(), jsonObject);
+
+
                 }
             }
         } catch (ReceivingException | DispatchGetException | DispatchPostException e) {
@@ -154,6 +156,7 @@ public class PackageProcessor {
                 logUtil.log(Fatal, e.getMessage());
                 stop(e);
             }
+
         }
 
     }
@@ -170,7 +173,7 @@ public class PackageProcessor {
                     }
                     url = systemConfigB.getDomain() + url;
                     if (packageB.getMethod().equals(Method.POST)) {
-                        connectorB.sendPostRequest(url, jsonObject);
+                        connectorB.sendPostRequest(url, PackageCollectorB.assembly(packageB.getRequestBody(), jsonObject));
                         jsonHandler.deleteFirstJsonObjectFromFile(packageB.getId());
                     }
                     if (packageB.getMethod().equals(Method.GET)) {
@@ -178,7 +181,7 @@ public class PackageProcessor {
                         jsonHandler.deleteFirstJsonObjectFromFile(packageB.getId());
                     }
                     if (packageB.getMethod().equals(Method.PUT)) {
-                        connectorB.sendPutRequest(url, jsonObject);
+                        connectorB.sendPutRequest(url, PackageCollectorB.assembly(packageB.getRequestBody(), jsonObject));
                         jsonHandler.deleteFirstJsonObjectFromFile(packageB.getId());
                     }
                 } else break;
