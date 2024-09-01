@@ -6,6 +6,8 @@ import config.json.Parameter;
 import exception.AuthorizationTimeoutException;
 import exception.DispatchPostException;
 import exception.ReceivingException;
+import log.LevelLog;
+import log.LogUtil;
 import lombok.Getter;
 import org.json.JSONObject;
 
@@ -21,11 +23,13 @@ public class AuthorizationManager {
     private String password;
     private final Connector connector;
     private final Authorization authorization;
+    private final LogUtil logUtil;
 
-    public AuthorizationManager(String domain, Connector connector, Authorization authorization) {
+    public AuthorizationManager(String domain, Connector connector, Authorization authorization, LogUtil logUtil) {
         this.domain = domain;
         this.connector = connector;
         this.authorization = authorization;
+        this.logUtil = logUtil;
     }
 
     public void authorize() throws AuthorizationTimeoutException {
@@ -71,6 +75,8 @@ public class AuthorizationManager {
             } catch (DispatchPostException | ReceivingException e) {
                 retryCount++;
                 try {
+                    logUtil.log(LevelLog.Error, "No connection to " + domain + authorization.getUrl());
+                    System.err.println("No connection to " + domain + authorization.getUrl());
                     Thread.sleep(10000);
                 } catch (InterruptedException ex) {
                     throw new RuntimeException(ex);

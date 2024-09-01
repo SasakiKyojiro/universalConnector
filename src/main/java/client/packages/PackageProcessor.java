@@ -49,8 +49,10 @@ public class PackageProcessor {
         systemConfigB = config.getSystemTypeB();
         connectorA = new Connector(systemConfigA.getTimeout(), SystemType.SYSTEM_TYPE_A);
         connectorB = new Connector(systemConfigB.getTimeout(), SystemType.SYSTEM_TYPE_B);
-        authorizationA = new AuthorizationManager(systemConfigA.getDomain(), connectorA, systemConfigA.getAuthorization());
-        authorizationB = new AuthorizationManager(systemConfigB.getDomain(), connectorB, systemConfigB.getAuthorization());
+        authorizationA = new AuthorizationManager(systemConfigA.getDomain(), connectorA,
+                systemConfigA.getAuthorization(), logUtil);
+        authorizationB = new AuthorizationManager(systemConfigB.getDomain(), connectorB,
+                systemConfigB.getAuthorization(), logUtil);
 
         if (config.isBuffering()) {
             buffering = true;
