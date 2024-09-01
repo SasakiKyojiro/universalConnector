@@ -36,6 +36,7 @@ public class Main {
             System.err.println(e.getMessage());
         }
         if (config != null && parsedItCorrectly) {
+            config.setLogPath(System.getProperty("user.dir")+config.getLogPath());
             Map<String, LevelLog> logLevelMap = new HashMap<>();
             logLevelMap.put(Debug.toString(), Debug);
             logLevelMap.put(Error.toString(), Error);

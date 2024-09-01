@@ -21,6 +21,24 @@ public class LogUtil {
         map.put(LevelLog.Error, 2);
         map.put(LevelLog.Fatal, 3);
         this.logLevel = map.get(logLevel);
+
+        Path filePath = Paths.get(logPath, "connector.log");
+
+        try {
+            // Проверяем наличие пути к файлу и создаем директории при необходимости
+            Files.createDirectories(filePath.getParent());
+
+            // Создаем файл, если его не существует
+            if (!Files.exists(filePath)) {
+                Files.createFile(filePath);
+                System.out.println("Файл успешно создан.");
+            } else {
+                System.out.println("Файл уже существует.");
+            }
+        } catch (IOException e) {
+            System.err.println("Ошибка при создании файла: " + e.getMessage());
+        }
+
     }
 
     public void log(LevelLog logLevel, String message) {
