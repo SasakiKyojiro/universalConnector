@@ -31,12 +31,12 @@ public class LogUtil {
             // Создаем файл, если его не существует
             if (!Files.exists(filePath)) {
                 Files.createFile(filePath);
-                System.out.println("Файл успешно создан.");
+                System.out.println("The file successful create: " + filePath.toAbsolutePath());
             } else {
-                System.out.println("Файл уже существует.");
+                System.out.println("The file already exists: "  + filePath.toAbsolutePath());
             }
         } catch (IOException e) {
-            System.err.println("Ошибка при создании файла: " + e.getMessage());
+            System.err.println("Error creating the file: " + e.getMessage());
         }
 
     }

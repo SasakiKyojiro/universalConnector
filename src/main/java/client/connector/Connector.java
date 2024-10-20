@@ -7,20 +7,39 @@ import exception.DispatchPutException;
 import exception.ReceivingException;
 import org.json.JSONObject;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+
 
 public class Connector {
     private final Integer timeOut;
     private final SystemType systemType;
+    private TrustManager[] trustAllCerts;
 
-    public Connector(Integer timeOut, SystemType systemType) {
+    public Connector(Integer timeOut, SystemType systemType, Boolean useCertificate) {
         this.timeOut = timeOut;
         this.systemType = systemType;
+        if (useCertificate) {
+            trustAllCerts = new TrustManager[]{new CustomTrustManager()};
+            SSLContext sc = null;
+            try {
+                sc = SSLContext.getInstance("TLS");
+                sc.init(null, trustAllCerts, new SecureRandom());
+            } catch (NoSuchAlgorithmException | KeyManagementException e) {
+                throw new RuntimeException(e);
+            }
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        }
     }
 
     public String sendGetRequest(String urlString) throws DispatchGetException, ReceivingException {
@@ -98,4 +117,5 @@ public class Connector {
         connection.disconnect();
         return response.toString();
     }
+
 }

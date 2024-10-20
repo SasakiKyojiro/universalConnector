@@ -47,8 +47,8 @@ public class PackageProcessor {
         packageList = PackageConnector.connectPackages(config);
         systemConfigA = config.getSystemTypeA();
         systemConfigB = config.getSystemTypeB();
-        connectorA = new Connector(systemConfigA.getTimeout(), SystemType.SYSTEM_TYPE_A);
-        connectorB = new Connector(systemConfigB.getTimeout(), SystemType.SYSTEM_TYPE_B);
+        connectorA = new Connector(systemConfigA.getTimeout(), SystemType.SYSTEM_TYPE_A, systemConfigA.isUseCertificate());
+        connectorB = new Connector(systemConfigB.getTimeout(), SystemType.SYSTEM_TYPE_B, systemConfigB.isUseCertificate());
         authorizationA = new AuthorizationManager(systemConfigA.getDomain(), connectorA,
                 systemConfigA.getAuthorization(), logUtil);
         authorizationB = new AuthorizationManager(systemConfigB.getDomain(), connectorB,

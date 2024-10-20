@@ -6,6 +6,7 @@
     "timeout": 1000,
     "domain": "http://localhost:8080",
     "use_auth": true,
+    "use_certificate": false,
     "authorization": {
       "type": "AUTH_TOKEN",
       "name": "token",
@@ -98,7 +99,7 @@
                     "type_param": "DATETIME",
                     "name": "date",
                     "flag": true,
-                    "name_b": "date"
+                    "name_b": "data"
                   },
                   {
                     "type_param": "BOOLEAN",
@@ -191,6 +192,7 @@
     "timeout": 1000,
     "domain": "http://localhost:8081",
     "use_auth": true,
+    "use_certificate": false,
     "authorization": {
       "type": "PERMANENT_TOKEN",
       "name": "token",
@@ -244,7 +246,7 @@
                 "params": [
                   {
                     "type_param": "DATETIME",
-                    "name": "date"
+                    "name": "data"
                   },
                   {
                     "type_param": "BOOLEAN",

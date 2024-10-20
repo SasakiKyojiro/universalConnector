@@ -19,6 +19,8 @@ public class SystemConfig {
     private String domain;
     @JsonProperty("use_auth")
     private boolean useAuth;
+    @JsonProperty("use_certificate")
+    private boolean useCertificate;
     @JsonProperty("authorization")
     private Authorization authorization;
     @JsonProperty("packages_delay")
