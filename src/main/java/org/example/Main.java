@@ -1,21 +1,21 @@
 package org.example;
 
-import client.packages.PackageProcessor;
+import org.example.client.packages.PackageProcessor;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
-import config.inspector.AvailabilityInspector;
-import config.inspector.QualityInspector;
-import config.json.Config;
-import config.parser.ConfigParser;
-import log.LevelLog;
-import log.LogUtil;
-import utils.AppCommander;
+import org.example.config.inspector.AvailabilityInspector;
+import org.example.config.inspector.QualityInspector;
+import org.example.config.json.Config;
+import org.example.config.parser.ConfigParser;
+import org.example.log.LevelLog;
+import org.example.log.LogUtil;
+import org.example.utils.AppCommander;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static log.LevelLog.*;
+import static org.example.log.LevelLog.*;
 
 public class Main {
     private static final AppCommander commander = new AppCommander();
@@ -31,26 +31,20 @@ public class Main {
             System.err.println(e.getLocalizedMessage());
             jCommander.usage();
         }
-        if(!commander.pathToConfig.isEmpty())
-        {
+        if(!commander.pathToConfig.isEmpty()) {
             String configFilePath = commander.pathToConfig;
-            try {
-                System.out.println("Начат парсинг");
-                ConfigParser configParser = new ConfigParser();
-                config = configParser.parseConfig(configFilePath);
-                if (config != null) {
-                    parsedItCorrectly = AvailabilityInspector.availabilityInspector(config);
-                    if(parsedItCorrectly){
-                        parsedItCorrectly = QualityInspector.qualityInspector(config);
-                        if(!parsedItCorrectly) System.err.println("Error filling in one of the packages in \"packages\"");
-                    }
+            System.out.println("Начат парсинг");
+            ConfigParser configParser = new ConfigParser();
+            config = configParser.parseConfig(configFilePath);
+            if (config != null) {
+                parsedItCorrectly = AvailabilityInspector.availabilityInspector(config);
+                if(parsedItCorrectly){
+                    parsedItCorrectly = QualityInspector.qualityInspector(config);
+                    if(!parsedItCorrectly) System.err.println("Error filling in one of the packages in \"packages\"");
                 }
-            } catch (IOException e) {
-                System.err.println(e.getMessage());
             }
         }
-        else
-            System.err.println("No config file specified.");
+        else System.err.println("No config file specified.");
         if (config != null && parsedItCorrectly) {
             config.setLogPath(System.getProperty("user.dir")+config.getLogPath());
             Map<String, LevelLog> logLevelMap = new HashMap<>();
