@@ -112,10 +112,12 @@ public class PackageProcessor {
         try {
             if (packageA.getMethod().equals(Method.GET)) {
                 String pack = systemConfigA.getDomain() + RequestProcessor.createUrl(packageCollector(packageA));
+                logUtil.log(Debug, "The following request was made to system A: " + pack);
                 request = connectorA.sendGetRequest(pack);
             }
             if (packageA.getMethod().equals(Method.POST)) {
                 JSONObject pack = RequestProcessor.createJson(packageA.getRequestBody());
+                logUtil.log(Debug, "The following package has been sent to system A: " + pack);
                 request = connectorA.sendPostRequest(systemConfigA.getDomain() + packageA.getUrl(), pack);
             }
             JSONObject response = null;
@@ -125,9 +127,11 @@ public class PackageProcessor {
                 logUtil.log(Warning, "The response was received, but not in json format from the system A. Package ID: " + packageA.getId());
             }
             if (response != null) {
+                logUtil.log(Debug, "Response from system A: " + response);
                 JSONObject jsonObject = PackageRecursiveHandler.recursivePackage(packageA.getResponseParams(), response);
                 jsonObject = PackageCollectorB.incompleteAssembler(jsonObject);
                 String url = packageB.getUrl();
+
                 if (!packageB.getRequestParams().isEmpty())
                     url = RequestProcessor.assemblyUrl(packageB, jsonObject);
                 url = systemConfigB.getDomain() + url;
@@ -135,22 +139,25 @@ public class PackageProcessor {
                     loadingFromBuffer(packageB);
                     if (packageB.getMethod().equals(Method.POST)) {
                         JSONObject pack = PackageCollectorB.assembly(packageB.getRequestBody(), jsonObject);
-                        connectorB.sendPostRequest(url, pack);
+                        logUtil.log(Debug, "The following package has been sent to system B: " + pack
+                                + "\tto this address: " + url);
+                        logUtil.log(Debug, "Response from system B: " + connectorB.sendPostRequest(url, pack));
                     }
                     if (packageB.getMethod().equals(Method.GET)) {
-                        connectorB.sendGetRequest(url);
+                        logUtil.log(Debug, "The following request was made to system B: " + url);
+                        logUtil.log(Debug, "Response from system B: " + connectorB.sendGetRequest(url));
                     }
                     if (packageB.getMethod().equals(Method.PUT)) {
                         JSONObject pack = PackageCollectorB.assembly(packageB.getRequestBody(), jsonObject);
-                        connectorB.sendPutRequest(url, pack);
+                        logUtil.log(Debug, "The following package has been sent to system B: " + pack
+                                + "\tto this address: " + url);
+                        logUtil.log(Debug, "Response from system B: " + connectorB.sendPutRequest(url, pack));
                     }
 
                 } catch (Exception e) {
                     logUtil.log(Error, "There is no connection to system B. Error: " + e.getMessage());
                     System.err.println("Package B " + packageB.getId() + " no connect " + e.getMessage());
                     if (buffering) jsonHandler.addJsonData(packageB.getId(), jsonObject);
-
-
                 }
             }
         } catch (ReceivingException | DispatchGetException | DispatchPostException e) {

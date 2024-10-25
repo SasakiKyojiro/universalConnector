@@ -9,31 +9,32 @@ import org.json.JSONObject;
 import java.util.List;
 
 
-
 public class RequestProcessor {
 
     public static @NotNull String createUrl(@NotNull Package pack) {
         String requests = "";
         StringBuilder urlBuilder = new StringBuilder(pack.getUrl());
-            if (pack.getRequestParams().isEmpty()) {
-                // Собираем URL из pathVariable
-                if (pack.getPathVariable().getValueTMP() == null)
-                    urlBuilder.append("/").append(pack.getPathVariable().getValue());
+        if (pack.getPathVariable().getTypeParam()!=null) {
+            // Собираем URL из pathVariable
+            if (pack.getPathVariable().getValueTMP() == null)
+                urlBuilder.append("/").append(pack.getPathVariable().getValue());
+            else
+                urlBuilder.append("/").append(pack.getPathVariable().getValueTMP());
+        }
+        if (!pack.getRequestParams().isEmpty()) {
+            urlBuilder.append("?");
+            // Собираем URL из requestParams
+            for (Parameter param : pack.getRequestParams()) {
+                if (!urlBuilder.isEmpty() && urlBuilder.charAt(urlBuilder.length() - 1) != '?')
+                    urlBuilder.append("&");
+                if (param.getValueTMP() == null)
+                    urlBuilder.append(param.getName()).append("=").append(param.getValue());
                 else
-                    urlBuilder.append("/").append(pack.getPathVariable().getValueTMP());
-            } else {
-                urlBuilder.append("?");
-                // Собираем URL из requestParams
-                for (Parameter param : pack.getRequestParams()) {
-                    if (!urlBuilder.isEmpty() && urlBuilder.charAt(urlBuilder.length() - 1) != '?')
-                        urlBuilder.append("&");
-                    if (param.getValueTMP() == null)
-                        urlBuilder.append(param.getName()).append("=").append(param.getValue());
-                    else
-                        urlBuilder.append(param.getName()).append("=").append(param.getValueTMP());
-                }
+                    urlBuilder.append(param.getName()).append("=").append(param.getValueTMP());
             }
-            requests = formatting(urlBuilder.toString());
+        }
+
+        requests = formatting(urlBuilder.toString());
 
         return requests;
     }

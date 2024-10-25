@@ -37,9 +37,7 @@ public class AssistantQualityInspector {
 
     public boolean comparison() {
         boolean result = true;
-        if (packageA.size() != packageB.size())
-            result = false;
-        else {
+
             for (String key : packageA.keySet()) {
                 String nameB = packageAB.get(key);
                 if (!nameB.isEmpty()) {
@@ -55,7 +53,6 @@ public class AssistantQualityInspector {
                     System.out.println("Field " + nameB + " missing in packageB.");
                 }
             }
-        }
         return result;
     }
 }

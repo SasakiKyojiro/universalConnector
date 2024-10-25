@@ -86,6 +86,7 @@ public class AuthorizationManager {
         if (retryCount == maxRetries) {
             throw new AuthorizationTimeoutException("Connection attempt limit exceeded " + domain);
         }
-        return jsonResponse;
+        JSONObject response = new JSONObject(jsonResponse);
+        return response.getString("token");
     }
 }
