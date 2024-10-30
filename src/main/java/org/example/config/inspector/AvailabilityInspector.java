@@ -30,7 +30,7 @@ public class AvailabilityInspector {
             availability = false;
             System.err.println("System type B is not valid");
         }
-        if(!(config.getSystemTypeA().getPackages().size() == config.getSystemTypeB().getPackages().size())){
+        if (!(config.getSystemTypeA().getPackages().size() == config.getSystemTypeB().getPackages().size())) {
             availability = false;
             System.err.println("System type A and B is not valid. The number of \"packages\" must be the same.");
         }

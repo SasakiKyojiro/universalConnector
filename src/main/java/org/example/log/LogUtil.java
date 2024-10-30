@@ -33,7 +33,7 @@ public class LogUtil {
                 Files.createFile(filePath);
                 System.out.println("The file successful create: " + filePath.toAbsolutePath());
             } else {
-                System.out.println("The file already exists: "  + filePath.toAbsolutePath());
+                System.out.println("The file already exists: " + filePath.toAbsolutePath());
             }
         } catch (IOException e) {
             System.err.println("Error creating the file: " + e.getMessage());
@@ -43,6 +43,10 @@ public class LogUtil {
 
     public void log(LevelLog logLevel, String message) {
         if (this.logLevel <= map.get(logLevel)) {
+            if (logLevel == LevelLog.Debug)
+                System.out.println(logLevel + ": " + message);
+            else
+                System.err.println(logLevel + ": " + message);
             LocalDateTime currentDateTime = LocalDateTime.now();
 
             // Создаем объект DateTimeFormatter для форматирования даты

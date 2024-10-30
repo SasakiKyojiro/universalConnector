@@ -1,5 +1,6 @@
 package org.example.client;
 
+import lombok.Getter;
 import org.example.client.connector.Connector;
 import org.example.config.json.Authorization;
 import org.example.config.json.Parameter;
@@ -8,7 +9,6 @@ import org.example.exception.DispatchPostException;
 import org.example.exception.ReceivingException;
 import org.example.log.LevelLog;
 import org.example.log.LogUtil;
-import lombok.Getter;
 import org.json.JSONObject;
 
 

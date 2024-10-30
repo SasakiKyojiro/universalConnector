@@ -1,4 +1,4 @@
-package org.example.config.packages;
+package org.example.client.connector;
 
 import org.example.config.json.Package;
 import org.example.config.json.Parameter;
@@ -14,7 +14,7 @@ public class RequestProcessor {
     public static @NotNull String createUrl(@NotNull Package pack) {
         String requests = "";
         StringBuilder urlBuilder = new StringBuilder(pack.getUrl());
-        if (pack.getPathVariable().getTypeParam()!=null) {
+        if (pack.getPathVariable().getTypeParam() != null) {
             // Собираем URL из pathVariable
             if (pack.getPathVariable().getValueTMP() == null)
                 urlBuilder.append("/").append(pack.getPathVariable().getValue());
@@ -33,22 +33,18 @@ public class RequestProcessor {
                     urlBuilder.append(param.getName()).append("=").append(param.getValueTMP());
             }
         }
-
         requests = formatting(urlBuilder.toString());
-
         return requests;
     }
 
     public static @NotNull String assemblyUrl(@NotNull Package pack, JSONObject jsonObject) {
-        StringBuilder urlBuilder = new StringBuilder(pack.getUrl());
-        if (!pack.getRequestParams().isEmpty()) {
-            urlBuilder.append("?");
-            for (Parameter param : pack.getRequestParams()) {
-                if (!urlBuilder.isEmpty() && urlBuilder.charAt(urlBuilder.length() - 1) != '?') urlBuilder.append("&");
-                urlBuilder.append(param.getName()).append("=").append(jsonObject.get(param.getName()));
-            }
+        for (Parameter param : pack.getRequestParams()) {
+            if (jsonObject.has(param.getName()))
+                param.setValueTMP(String.valueOf(jsonObject.get(param.getName())));
         }
-        return formatting(urlBuilder.toString());
+        if (jsonObject.has(pack.getPathVariable().getName()))
+            pack.getPathVariable().setValueTMP(String.valueOf(jsonObject.get(pack.getPathVariable().getName())));
+        return createUrl(pack);
     }
 
     private static String formatting(String input) {
@@ -71,4 +67,6 @@ public class RequestProcessor {
         }
         return jsonObject;
     }
+
+
 }

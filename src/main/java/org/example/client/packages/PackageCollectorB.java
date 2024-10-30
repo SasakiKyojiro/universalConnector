@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 public class PackageCollectorB {
-    public  static JSONObject incompleteAssembler (@NotNull JSONObject answerAServer){
+    public static JSONObject incompleteAssembler(@NotNull JSONObject answerAServer) {
         Map<String, JSONArray> resultMap = new HashMap<>();
         processJsonObject(answerAServer, resultMap);
         JSONObject tmp = new JSONObject(resultMap);
@@ -30,19 +30,17 @@ public class PackageCollectorB {
         return result;
     }
 
-    private static void jsonPackageCollector (@NotNull List<Parameter> parameters, JSONObject tmp,
-                                              JSONObject listObject, JSONObject result){
+    private static void jsonPackageCollector(@NotNull List<Parameter> parameters, JSONObject tmp,
+                                             JSONObject listObject, JSONObject result) {
         for (Parameter parameter : parameters) {
             if (parameter.getTypeParam().equals(ParameterType.LIST_OBJECT)) {
                 result.put(parameter.getName(), listObject.getJSONArray(parameter.getName()));
                 listObject.remove(parameter.getName());
-            }
-            else if (parameter.getTypeParam().equals(ParameterType.OBJECT)){
+            } else if (parameter.getTypeParam().equals(ParameterType.OBJECT)) {
                 JSONObject obj = new JSONObject();
                 jsonPackageCollector(parameter.getParams(), tmp, listObject, obj);
                 result.put(parameter.getName(), obj);
-            }
-            else {
+            } else {
                 result.put(parameter.getName(), tmp.get(parameter.getName()));
             }
         }
@@ -103,7 +101,7 @@ public class PackageCollectorB {
                                 resultMap.put(innerKey, newArray);
                             }
                         }
-                     else {
+                    else {
                         resultMap.put(key, jsonArray);
                         break;
                     }

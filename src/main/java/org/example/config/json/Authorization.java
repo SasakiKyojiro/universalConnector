@@ -1,11 +1,11 @@
 package org.example.config.json;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.example.config.types.AuthorizationType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.config.types.AuthorizationType;
 
 import java.util.List;
 

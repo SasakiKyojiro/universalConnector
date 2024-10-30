@@ -1,8 +1,8 @@
 package org.example.config.packages;
 
-import org.example.config.json.Package;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.example.config.json.Package;
 
 
 @AllArgsConstructor

@@ -15,7 +15,7 @@ public class PackageConnector {
         SystemConfig systemTypeA = config.getSystemTypeA();
         SystemConfig systemTypeB = config.getSystemTypeB();
         Map<Integer, Package> packageMap = new HashMap<>();
-        List <LinkedPackage> linkedPackages = new ArrayList<>();
+        List<LinkedPackage> linkedPackages = new ArrayList<>();
 
         // Соединяем пакеты из systemTypeA
         for (Package pkg : systemTypeA.getPackages()) {

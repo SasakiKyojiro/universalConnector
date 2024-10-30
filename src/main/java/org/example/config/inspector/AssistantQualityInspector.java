@@ -38,21 +38,21 @@ public class AssistantQualityInspector {
     public boolean comparison() {
         boolean result = true;
 
-            for (String key : packageA.keySet()) {
-                String nameB = packageAB.get(key);
-                if (!nameB.isEmpty()) {
-                    ParameterType valueA = packageA.get(key);
-                    ParameterType valueB = packageB.get(nameB);
-                    if (!valueA.equals(valueB)) {
-                        result = false;
-                        System.out.printf("The %s field and the %s field have different data types.\n",
-                                key, nameB);
-                    }
-                } else {
+        for (String key : packageA.keySet()) {
+            String nameB = packageAB.get(key);
+            if (!nameB.isEmpty()) {
+                ParameterType valueA = packageA.get(key);
+                ParameterType valueB = packageB.get(nameB);
+                if (!valueA.equals(valueB)) {
                     result = false;
-                    System.out.println("Field " + nameB + " missing in packageB.");
+                    System.out.printf("The %s field and the %s field have different data types.\n",
+                            key, nameB);
                 }
+            } else {
+                result = false;
+                System.out.println("Field " + nameB + " missing in packageB.");
             }
+        }
         return result;
     }
 }

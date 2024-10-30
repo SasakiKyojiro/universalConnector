@@ -1,8 +1,8 @@
 package org.example;
 
-import org.example.client.packages.PackageProcessor;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
+import org.example.client.packages.PackageProcessor;
 import org.example.config.inspector.AvailabilityInspector;
 import org.example.config.inspector.QualityInspector;
 import org.example.config.json.Config;
@@ -11,7 +11,6 @@ import org.example.log.LevelLog;
 import org.example.log.LogUtil;
 import org.example.utils.AppCommander;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,27 +25,25 @@ public class Main {
     public static void main(String[] args) {
         try {
             jCommander.parse(args);
-        }
-        catch (ParameterException e) {
+        } catch (ParameterException e) {
             System.err.println(e.getLocalizedMessage());
             jCommander.usage();
         }
-        if(!commander.pathToConfig.isEmpty()) {
+        if (!commander.pathToConfig.isEmpty()) {
             String configFilePath = commander.pathToConfig;
             System.out.println("Начат парсинг");
             ConfigParser configParser = new ConfigParser();
             config = configParser.parseConfig(configFilePath);
             if (config != null) {
                 parsedItCorrectly = AvailabilityInspector.availabilityInspector(config);
-                if(parsedItCorrectly){
+                if (parsedItCorrectly) {
                     parsedItCorrectly = QualityInspector.qualityInspector(config);
-                    if(!parsedItCorrectly) System.err.println("Error filling in one of the packages in \"packages\"");
+                    if (!parsedItCorrectly) System.err.println("Error filling in one of the packages in \"packages\"");
                 }
             }
-        }
-        else System.err.println("No config file specified.");
+        } else System.err.println("No config file specified.");
         if (config != null && parsedItCorrectly) {
-            config.setLogPath(System.getProperty("user.dir")+config.getLogPath());
+            config.setLogPath(System.getProperty("user.dir") + config.getLogPath());
             Map<String, LevelLog> logLevelMap = new HashMap<>();
             logLevelMap.put(Debug.toString(), Debug);
             logLevelMap.put(Error.toString(), Error);
